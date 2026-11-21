@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nyctophile — Share. Connect. Express.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A0B14;
+  --panel:#12131F;
+  --panel-2:#181A2A;
+  --line:#262840;
+  --violet:#8D7CFF;
+  --violet-dim:#5B4FCE;
+  --blue:#5FA8FF;
+  --gold:#E8C888;
+  --text:#EDEDF5;
+  --text-dim:#9A9AB8;
+  --text-faint:#5E6080;
+  --danger:#FF6B7A;
+  --radius:14px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{background:var(--void); color:var(--text); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+body{min-height:100vh; overflow-x:hidden;}
+img{max-width:100%; display:block;}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+input,textarea,select{font-family:inherit; color:var(--text); background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:11px 14px; font-size:14.5px; outline:none; width:100%;}
+input:focus,textarea:focus,select:focus{border-color:var(--violet-dim);}
+a{color:inherit; text-decoration:none;}
+.serif{font-family:'Spectral',serif;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:10px;}
+
+.stars{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.55;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 65% 15%, #fff 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 60%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 40% 80%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 10% 65%, #fff 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 92% 25%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 55% 50%, #fff 0, transparent 100%),
+    radial-gradient(1px 1px at 30% 10%, #fff 0, transparent 100%);
+  background-repeat:no-repeat;
+}
+
+/* ---------- App shell ---------- */
+#app{position:relative; z-index:1; min-height:100vh;}
+.shell{display:flex; max-width:1180px; margin:0 auto; min-height:100vh;}
+.sidebar{width:230px; flex-shrink:0; padding:26px 14px; display:flex; flex-direction:column; gap:2px; border-right:1px solid var(--line); position:sticky; top:0; height:100vh;}
+.brand{display:flex; align-items:center; gap:10px; padding:6px 10px 26px 10px;}
+.brand .mark{width:30px; height:30px;}
+.brand .word{font-family:'Spectral',serif; font-style:italic; font-size:21px; letter-spacing:.2px;}
+.navlink{display:flex; align-items:center; gap:13px; padding:11px 12px; border-radius:11px; color:var(--text-dim); font-size:15px; font-weight:500; position:relative;}
+.navlink:hover{background:var(--panel); color:var(--text);}
+.navlink.active{background:var(--panel-2); color:var(--text);}
+.navlink svg{width:20px; height:20px; flex-shrink:0;}
+.navlink .badge{position:absolute; right:10px; background:var(--violet); color:#fff; font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:20px;}
+.nav-user{margin-top:auto; display:flex; align-items:center; gap:10px; padding:10px; border-radius:11px;}
+.nav-user:hover{background:var(--panel);}
+.avatar{border-radius:50%; object-fit:cover; background:linear-gradient(135deg,var(--violet),var(--blue)); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff;}
+.main{flex:1; min-width:0; padding:0 20px;}
+.topbar{display:none;}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 18px; border-radius:10px; font-weight:600; font-size:14px; transition:transform .15s ease, opacity .15s ease;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--violet),#6E5FE0); color:#fff;}
+.btn-primary:hover{opacity:.92;}
+.btn-ghost{background:var(--panel-2); color:var(--text); border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--violet-dim);}
+.btn-danger{background:rgba(255,107,122,.12); color:var(--danger); border:1px solid rgba(255,107,122,.3);}
+.btn-sm{padding:6px 13px; font-size:13px; border-radius:8px;}
+.btn-icon{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--panel-2); border:1px solid var(--line);}
+
+.card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);}
+.muted{color:var(--text-dim);}
+.faint{color:var(--text-faint);}
+
+/* ---------- Landing ---------- */
+.landing{max-width:100%;}
+.landing-nav{display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; padding:26px 24px;}
+.hero{max-width:1100px; margin:0 auto; padding:60px 24px 90px; text-align:center; position:relative;}
+.hero h1{font-family:'Spectral',serif; font-style:italic; font-size:clamp(42px,8vw,84px); font-weight:500; letter-spacing:.5px; background:linear-gradient(135deg,#fff 30%, var(--violet) 90%); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1.05;}
+.hero .tag{margin-top:18px; font-size:19px; color:var(--text-dim); font-weight:500;}
+.hero p{max-width:560px; margin:20px auto 0; color:var(--text-faint); font-size:15.5px; line-height:1.65;}
+.hero-actions{display:flex; gap:14px; justify-content:center; margin-top:34px;}
+.crescent{width:150px; height:150px; margin:0 auto 10px; opacity:.9;}
+.feature-grid{max-width:1100px; margin:0 auto; padding:0 24px 100px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+.feature{padding:26px 20px; text-align:left;}
+.feature .ic{font-size:22px; margin-bottom:14px;}
+.feature h3{font-family:'Spectral',serif; font-size:19px; margin-bottom:8px;}
+.feature p{font-size:13.5px; color:var(--text-faint); line-height:1.55;}
+.footer{border-top:1px solid var(--line); padding:34px 24px; text-align:center; color:var(--text-faint); font-size:13px;}
+
+/* ---------- Auth ---------- */
+.authwrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+.authcard{width:100%; max-width:400px; padding:36px 32px;}
+.authcard h2{font-family:'Spectral',serif; font-style:italic; font-size:28px; margin-bottom:6px;}
+.authcard .sub{color:var(--text-faint); font-size:13.5px; margin-bottom:26px;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:6px; font-weight:600;}
+.authfoot{margin-top:20px; text-align:center; font-size:13.5px; color:var(--text-faint);}
+.authfoot a{color:var(--violet); font-weight:600;}
+.errmsg{background:rgba(255,107,122,.1); border:1px solid rgba(255,107,122,.3); color:var(--danger); font-size:13px; padding:9px 12px; border-radius:8px; margin-bottom:14px;}
+
+/* ---------- Feed / Post ---------- */
+.feedwrap{max-width:560px; margin:0 auto; padding:24px 0 90px;}
+.post{margin-bottom:20px; overflow:hidden;}
+.post-head{display:flex; align-items:center; gap:11px; padding:14px 16px;}
+.post-head .who{flex:1; min-width:0;}
+.post-head .uname{font-weight:600; font-size:14.5px;}
+.post-head .time{font-size:12px; color:var(--text-faint);}
+.post-media{width:100%; background:#000; position:relative;}
+.post-media img{width:100%; object-fit:cover; max-height:600px;}
+.post-carousel{display:flex; overflow-x:auto; scroll-snap-type:x mandatory;}
+.post-carousel img{flex:0 0 100%; scroll-snap-align:start; max-height:600px; object-fit:cover;}
+.dots{display:flex; gap:5px; justify-content:center; padding:8px 0 0;}
+.dots span{width:5px; height:5px; border-radius:50%; background:var(--line);}
+.post-actions{display:flex; align-items:center; gap:14px; padding:12px 16px 4px;}
+.post-actions .act{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--text-dim); font-weight:600;}
+.post-actions .act svg{width:21px; height:21px;}
+.post-actions .act.liked{color:var(--danger);}
+.post-actions .act.saved{color:var(--gold);}
+.post-actions .spacer{flex:1;}
+.post-body{padding:6px 16px 4px;}
+.post-body .cap{font-size:14.5px; line-height:1.5;}
+.post-body .cap b{font-weight:600; margin-right:6px;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+.tag{font-size:12px; color:var(--blue); font-weight:600;}
+.post-comments{padding:6px 16px 16px;}
+.comment{display:flex; gap:9px; padding:7px 0;}
+.comment .txt{font-size:13.5px; line-height:1.4;}
+.comment .txt b{font-weight:600; margin-right:5px;}
+.comment-meta{display:flex; gap:12px; margin-top:3px; font-size:11.5px; color:var(--text-faint); font-weight:600;}
+.comment-input{display:flex; gap:8px; margin-top:8px; align-items:center;}
+.comment-input input{flex:1; background:transparent; border:none; border-top:1px solid var(--line); border-radius:0; padding:12px 0 4px; font-size:13.5px;}
+.see-more{font-size:13px; color:var(--text-faint); font-weight:600; cursor:pointer;}
+.empty{text-align:center; padding:70px 20px; color:var(--text-faint);}
+.empty .moon{font-size:34px; margin-bottom:14px;}
+
+/* ---------- Grid (explore/profile) ---------- */
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:3px;}
+.grid3 .cell{aspect-ratio:1; overflow:hidden; position:relative; background:var(--panel-2);}
+.grid3 .cell img{width:100%; height:100%; object-fit:cover;}
+.masonry{columns:3; column-gap:10px;}
+.masonry .mitem{break-inside:avoid; margin-bottom:10px; border-radius:12px; overflow:hidden; position:relative;}
+.masonry .mitem img{width:100%; display:block;}
+
+/* ---------- Section headers ---------- */
+.section-title{font-family:'Spectral',serif; font-style:italic; font-size:23px; margin:26px 0 16px;}
+.pagehead{padding:24px 0 4px;}
+.searchbar{position:relative; margin-bottom:18px;}
+.searchbar input{padding-left:38px;}
+.searchbar svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--text-faint);}
+.chiprow{display:flex; gap:8px; overflow-x:auto; padding-bottom:16px;}
+.chip{white-space:nowrap; padding:7px 15px; border-radius:20px; background:var(--panel); border:1px solid var(--line); font-size:13px; font-weight:600; color:var(--text-dim);}
+.chip.active{background:var(--violet); color:#fff; border-color:var(--violet);}
+
+/* ---------- Profile ---------- */
+.profile-head{display:flex; gap:26px; align-items:flex-start; padding:30px 0 10px;}
+.profile-stats{display:flex; gap:26px; margin:16px 0;}
+.profile-stats .n{font-weight:700; font-size:16px;}
+.profile-stats .l{color:var(--text-faint); font-size:12.5px;}
+.tabs{display:flex; gap:4px; border-top:1px solid var(--line); margin-top:14px;}
+.tabbtn{flex:1; padding:13px; text-align:center; font-size:12.5px; font-weight:700; letter-spacing:.4px; color:var(--text-faint); border-top:2px solid transparent; margin-top:-1px;}
+.tabbtn.active{color:var(--text); border-color:var(--violet);}
+
+/* ---------- Modal ---------- */
+.modal-bg{position:fixed; inset:0; background:rgba(6,6,12,.72); backdrop-filter:blur(3px); z-index:50; display:flex; align-items:center; justify-content:center; padding:20px;}
+.modal{width:100%; max-width:560px; max-height:88vh; overflow:auto; padding:26px;}
+.modal h3{font-family:'Spectral',serif; font-size:21px; margin-bottom:18px;}
+.modal-close{position:absolute; top:16px; right:16px;}
+.drop{border:1.5px dashed var(--line); border-radius:12px; padding:34px 14px; text-align:center; color:var(--text-faint); font-size:13.5px; cursor:pointer;}
+.drop:hover{border-color:var(--violet-dim);}
+.preview-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0;}
+.preview-grid .pv{position:relative; aspect-ratio:1; border-radius:10px; overflow:hidden;}
+.preview-grid .pv img{width:100%; height:100%; object-fit:cover;}
+.preview-grid .pv .rm{position:absolute; top:4px; right:4px; width:20px; height:20px; background:rgba(0,0,0,.6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px;}
+
+/* ---------- Groups ---------- */
+.group-card{padding:16px; display:flex; gap:14px; align-items:center; margin-bottom:12px;}
+.group-cover{width:64px; height:64px; border-radius:12px; object-fit:cover; flex-shrink:0; background:linear-gradient(135deg,var(--violet-dim),var(--blue));}
+.priv-badge{font-size:10.5px; padding:2px 7px; border-radius:6px; background:var(--panel-2); color:var(--text-faint); font-weight:700;}
+
+
+.share-recipient{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.share-recipient input{width:17px;height:17px;accent-color:var(--violet);flex-shrink:0}
+.share-recipient .share-name{flex:1;min-width:0}
+.share-recipient .share-handle{font-size:11.5px;color:var(--text-faint)}
+.share-list{max-height:48vh;overflow:auto;margin:10px 0 16px}
+/* ---------- Notifications / Messages ---------- */
+.notif{display:flex; gap:12px; padding:13px 4px; align-items:center; border-bottom:1px solid var(--line);}
+.notif.unread{background:rgba(141,124,255,.05);}
+.convo{display:flex; gap:12px; padding:13px 4px; align-items:center; border-bottom:1px solid var(--line);}
+.msg-thread{display:flex; flex-direction:column; justify-content:flex-start; gap:8px; padding:16px 0; height:52vh; max-height:520px; min-height:220px; overflow-y:scroll !important; overflow-x:hidden; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; scroll-behavior:smooth; scrollbar-gutter:stable;}
+.bubble{max-width:72%; padding:9px 13px; border-radius:16px; font-size:13.5px; line-height:1.4;}
+.bubble.me{align-self:flex-end; background:linear-gradient(135deg,var(--violet),#6E5FE0); color:#fff; border-bottom-right-radius:4px;}
+.bubble.them{align-self:flex-start; background:var(--panel-2); border-bottom-left-radius:4px;}
+.presence-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#777;margin-right:6px;vertical-align:middle;border:1px solid var(--panel)}
+.presence-dot.online{background:#22c55e}.typing-label{font-size:12px;color:var(--text-faint);padding:0 4px;min-height:17px}
+
+/* ---------- Admin ---------- */
+.stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px;}
+.stat{padding:18px; text-align:center;}
+.stat .num{font-family:'Spectral',serif; font-size:30px;}
+.stat .lbl{font-size:12px; color:var(--text-faint); margin-top:4px;}
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+th{text-align:left; color:var(--text-faint); font-size:11.5px; text-transform:uppercase; letter-spacing:.4px; padding:9px 10px; border-bottom:1px solid var(--line);}
+td{padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+
+/* ---------- Toast ---------- */
+.toast-wrap{position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:100; display:flex; flex-direction:column; gap:8px; align-items:center;}
+.toast{background:var(--panel); border:1px solid var(--line); padding:11px 20px; border-radius:30px; font-size:13.5px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.4); animation:slidein .25s ease;}
+@keyframes slidein{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);}}
+
+.heart-pop{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;}
+.heart-pop svg{width:90px; height:90px; animation:heartpop .7s ease forwards;}
+@keyframes heartpop{0%{transform:scale(0); opacity:0;} 25%{transform:scale(1.15); opacity:1;} 45%{transform:scale(1);} 100%{transform:scale(1); opacity:0;}}
+
+.skel{background:linear-gradient(90deg,var(--panel) 25%,var(--panel-2) 50%,var(--panel) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite;}
+@keyframes shimmer{0%{background-position:200% 0;} 100%{background-position:-200% 0;}}
+@keyframes streak-flame-pop{0%,100%{transform:scale(1) rotate(0deg);}35%{transform:scale(1.35) rotate(-8deg);}70%{transform:scale(1.12) rotate(7deg);}}
+@keyframes streak-orange-glow{0%,100%{filter:drop-shadow(0 0 3px #ff6a00);}50%{filter:drop-shadow(0 0 11px #ffb000) saturate(1.8);}}
+@keyframes streak-blue-glow{0%,100%{filter:drop-shadow(0 0 4px #00aaff);}50%{filter:drop-shadow(0 0 13px #55eaff) saturate(2);}}
+@keyframes streak-purple-glow{0%,100%{filter:drop-shadow(0 0 4px #963cff);}50%{filter:drop-shadow(0 0 14px #e05bff) saturate(2);}}
+@keyframes streak-rainbow-glow{0%{filter:hue-rotate(0deg) drop-shadow(0 0 5px #ff3b18);}50%{filter:hue-rotate(180deg) drop-shadow(0 0 14px #ffe45c);}100%{filter:hue-rotate(360deg) drop-shadow(0 0 5px #ff3b18);}}
+.streak-milestone .streak-flame{display:inline-block;transform-origin:50% 80%;animation:streak-flame-pop 1.1s ease-in-out infinite;}
+.streak-30 .streak-flame{animation:streak-flame-pop 1.1s ease-in-out infinite,streak-orange-glow 1.5s ease-in-out infinite;}
+.streak-100 .streak-flame{animation:streak-flame-pop 1.1s ease-in-out infinite,streak-blue-glow 1.4s ease-in-out infinite;}
+.streak-200 .streak-flame{animation:streak-flame-pop 1.1s ease-in-out infinite,streak-purple-glow 1.3s ease-in-out infinite;}
+.streak-300 .streak-flame{animation:streak-flame-pop 1.1s ease-in-out infinite,streak-rainbow-glow 2s linear infinite;}
+.streak-milestone{padding:2px 7px;border-radius:12px;background:linear-gradient(110deg,rgba(255,70,20,.13),rgba(255,210,0,.13),rgba(160,70,255,.13));box-shadow:0 0 0 1px rgba(255,145,40,.25);}
+@media(prefers-reduced-motion:reduce){.streak-milestone .streak-flame{animation:none;}}
+
+/* ---------- Mobile ---------- */
+.bottomnav{display:none;}
+@media (max-width:880px){
+  .sidebar{display:none;}
+  .main{padding:0 14px;}
+  .shell{display:block;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 4px; position:sticky; top:0; background:rgba(10,11,20,.85); backdrop-filter:blur(10px); z-index:20;}
+  .bottomnav{display:flex; position:fixed; bottom:0; left:0; right:0; background:rgba(15,16,26,.92); backdrop-filter:blur(12px); border-top:1px solid var(--line); z-index:30; padding:8px 6px calc(8px + env(safe-area-inset-bottom));}
+  .bottomnav a{flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--text-faint); font-size:9.5px; font-weight:600; padding:4px;}
+  .bottomnav a.active{color:var(--violet);}
+  .bottomnav svg{width:22px; height:22px;}
+  .feedwrap{padding-bottom:80px;}
+  .feature-grid{grid-template-columns:1fr 1fr;}
+  .profile-head{gap:16px;}
+  main-content{padding-bottom:70px;}
+}
+
+/* ---------- Enhanced phone layout ---------- */
+@media (max-width: 600px){
+  html,body{width:100%; min-width:0;}
+  .main{padding:0 10px; width:100%;}
+  .topbar{padding:10px 2px; min-height:54px;}
+  .topbar .brand .word{font-size:17px!important;}
+  .feedwrap{width:100%; max-width:none; padding:12px 0 92px;}
+  .post{border-left:0; border-right:0; border-radius:12px; margin:0 0 13px;}
+  .post-head{padding:12px; gap:9px;}
+  .post-actions{padding:11px 12px 4px; gap:12px;}
+  .post-body{padding:6px 12px 4px;}
+  .post-comments{padding:6px 12px 14px;}
+  .post-media img,.post-carousel img{max-height: min(72vh, 540px); object-fit:contain;}
+  .bottomnav{justify-content:space-around; padding:7px 3px calc(7px + env(safe-area-inset-bottom));}
+  .bottomnav a{position:relative; min-width:0; padding:5px 1px; font-size:8.5px; gap:3px;}
+  .bottomnav svg{width:21px;height:21px;}
+  .section-title{font-size:21px; margin:20px 0 13px;}
+  .pagehead{padding:16px 0 4px;}
+  .feature-grid{grid-template-columns:1fr 1fr; gap:10px; padding:0 12px 70px;}
+  .feature{padding:18px 14px;}
+  .hero{padding:42px 18px 60px;}
+  .hero .tag{font-size:16px;}
+  .hero p{font-size:14px;}
+  .hero-actions{flex-wrap:wrap; gap:9px;}
+  .landing-nav{padding:18px 16px;}
+  .authwrap{padding:14px;}
+  .authcard{padding:27px 20px;}
+  .profile-head{gap:13px; padding:20px 0 8px; flex-wrap:wrap;}
+  .profile-stats{gap:18px; flex-wrap:wrap; margin:12px 0;}
+  .profile-stats .n{font-size:15px;}
+  .grid3{gap:2px;}
+  .masonry{columns:2; column-gap:7px;}
+  .masonry .mitem{margin-bottom:7px;}
+  .group-card{padding:12px; gap:10px; align-items:flex-start;}
+  .group-cover{width:54px;height:54px;}
+  .notif,.convo{gap:9px; padding:11px 2px;}
+  .msg-thread{height:calc(100dvh - 300px); max-height:none; min-height:220px; padding:12px 0; overflow-y:scroll !important; touch-action:pan-y; -webkit-overflow-scrolling:touch;}
+  .bubble{max-width:86%;}
+  .modal-bg{padding:10px; align-items:flex-end;}
+  .modal{max-width:none; max-height:90dvh; border-radius:18px 18px 12px 12px; padding:20px 16px;}
+  .preview-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  .stat{padding:13px 8px;}
+  .stat .num{font-size:25px;}
+  table{min-width:560px;}
+  .main table{display:block; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  input,textarea,select{font-size:16px;}
+  button,.btn,.navlink,.bottomnav a{touch-action:manipulation;}
+}
+@media (max-width: 380px){
+  .main{padding:0 7px;}
+  .bottomnav a{font-size:7.5px;}
+  .bottomnav svg{width:19px;height:19px;}
+  .post-actions{gap:9px;}
+  .post-actions .act{font-size:12px;}
+  .profile-stats{gap:12px;}
+  .feature-grid{grid-template-columns:1fr;}
+}
+@media (min-width: 601px) and (max-width: 880px){
+  .main{padding:0 18px;}
+  .feedwrap{max-width:600px;}
+  .feature-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="stars"></div>
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* =========================================================
+   NYCTOPHILE — client-side app backed by window.storage
+   All "tables" below are persisted via the storage API and
+   shared across everyone who opens this artifact.
+   ========================================================= */
+
+// Supabase public client configuration. Never place a service_role key here.
+const SUPABASE_URL = 'https://fvdrbvhvjzteshbgbntw.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_pssMMxxHWn4r3_JN2enmzg_qaN-3tTp';
+const supabaseClient = window.supabase?.createClient
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
+
+const ICONS = {
+  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/></svg>`,
+  explore:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5z"/></svg>`,
+  groups:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M10 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/></svg>`,
+  create:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg>`,
+  messages:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.6 8.6 0 0 1-3.6-.8L3 20l1-4.9A8.4 8.4 0 1 1 21 11.5Z"/></svg>`,
+  bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>`,
+  user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>`,
+  heart:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20.5s-7.5-4.7-10-9.4C.4 7.7 2.3 4 6 4c2.2 0 3.8 1.2 6 3.6C14.2 5.2 15.8 4 18 4c3.7 0 5.6 3.7 4 7.1-2.5 4.7-10 9.4-10 9.4Z"/></svg>`,
+  heartFill:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5s-7.5-4.7-10-9.4C.4 7.7 2.3 4 6 4c2.2 0 3.8 1.2 6 3.6C14.2 5.2 15.8 4 18 4c3.7 0 5.6 3.7 4 7.1-2.5 4.7-10 9.4-10 9.4Z"/></svg>`,
+  comment:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.6 8.6 0 0 1-3.6-.8L3 20l1-4.9A8.4 8.4 0 1 1 21 11.5Z"/></svg>`,
+  share:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>`,
+  bookmark:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>`,
+  bookmarkFill:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>`,
+  search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`,
+  lock:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`,
+  shield:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 4.5-3.4 7.7-8 9-4.6-1.3-8-4.5-8-9V6l8-3Z"/></svg>`,
+};
+const CATEGORIES = ["Photography","Night","Nature","Travel","Art","Cars","Technology","Gaming","Fashion","Food","Fitness","Animals","Architecture","Music","Ideas","Other"];
+const CAT_EMOJI = {Photography:"📸",Night:"🌌",Nature:"🌿",Travel:"✈️",Art:"🎨",Cars:"🚗",Technology:"💻",Gaming:"🎮",Fashion:"👗",Food:"🍔",Fitness:"🏋️",Animals:"🐾",Architecture:"🏙️",Music:"🎵",Ideas:"💡",Other:"🌍"};
+const REPORT_REASONS = ["Spam","Harassment","Hate","Nudity/sexual content","Violence","Copyright","Scam","Other"];
+
+/* ---------------- storage helpers ---------------- */
+async function dbGet(key, fallback){
+  try{ const r = await window.storage.get(key, true); return r ? JSON.parse(r.value) : fallback; }
+  catch(e){ return fallback; }
+}
+async function dbSet(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), true); }
+  catch(e){ console.error('storage error', key, e); }
+}
+
+/* in-memory cache of all tables, hydrated at boot */
+let DB = {
+  users:{}, posts:{}, comments:{}, likes:{}, follows:{}, saves:{},
+  groups:{}, groupPosts:{}, notifications:{}, messages:{}, conversations:{}, chatStreaks:{}, chatStreakRestoreUsage:{cards_used:0}, reports:[]
+};
+let session = null; // {username}
+let route = {view:'landing', params:{}};
+let uiState = { exploreCat:'All', exploreQuery:'', profileTab:'posts', groupTab:'feed', authError:'', activeGroupChat:null };
+let groupChatChannel = null;
+
+async function loadDB(){
+  const [users,posts,comments,likes,follows,saves,groups,groupPosts,notifications,messages,conversations,reports] = await Promise.all([
+    dbGet('db:users',{}), dbGet('db:posts',{}), dbGet('db:comments',{}), dbGet('db:likes',{}),
+    dbGet('db:follows',{}), dbGet('db:saves',{}), dbGet('db:groups',{}), dbGet('db:groupPosts',{}),
+    dbGet('db:notifications',{}), dbGet('db:messages',{}), dbGet('db:conversations',{}), dbGet('db:reports',[])
+  ]);
+  DB = {users,posts,comments,likes,follows,saves,groups,groupPosts,notifications,messages,conversations,chatStreaks:{},chatStreakRestoreUsage:{cards_used:0},reports};
+}
+async function save(table){ await dbSet('db:'+table, DB[table]); }
+
+function uid(prefix){ return prefix+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  if(s<2592000) return Math.floor(s/86400)+'d ago';
+  return new Date(ts).toLocaleDateString();
+}
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 2600);
+}
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function scrollChatToBottom(){ const box=document.querySelector('.msg-thread'); if(box){ box.scrollTop=box.scrollHeight; requestAnimationFrame(()=>{box.scrollTop=box.scrollHeight;}); } }
+function go(view, params={}){ route = {view, params}; renderApp(); window.scrollTo(0,0); if(view==='thread' && params.id){ subscribeToTyping(params.id); markConversationRead(params.id); requestAnimationFrame(()=>requestAnimationFrame(scrollChatToBottom)); } }
+
+function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function avatarHTML(username, size=38){
+  const u = DB.users[username];
+  const name = u ? u.name : username;
+  if(u && u.avatar){
+    return `<img class="avatar" src="${u.avatar}" style="width:${size}px;height:${size}px" alt="">`;
+  }
+  return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*0.38}px">${initials(name)}</div>`;
+}
+
+/* ---------------- image handling ---------------- */
+function readAndResize(file, maxW=1000, quality=0.72){
+  return new Promise((resolve,reject)=>{
+    if(!file.type.startsWith('image/')) return reject('Not an image');
+    if(file.size > 15*1024*1024) return reject('File too large (max 15MB)');
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const scale = Math.min(1, maxW/img.width);
+        const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+        const canvas = document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = ()=>reject('Could not read image');
+      img.src = e.target.result;
+    };
+    reader.onerror = ()=>reject('Could not read file');
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------------- notifications ---------------- */
+async function loadNotificationActorProfiles(actorIds=[]){
+  if(!supabaseClient) return;
+  const ids=[...new Set(actorIds.filter(Boolean))];
+  const missing=ids.filter(id=>!Object.values(DB.users).some(user=>user.id===id));
+  if(!missing.length) return;
+  const {data:profiles,error}=await supabaseClient.from('profiles')
+    .select('id,username,display_name,bio,avatar_url,created_at').in('id',missing);
+  if(error) throw error;
+  (profiles||[]).forEach(profile=>{
+    const user=profileToUser(profile);
+    DB.users[user.username]=user;
+  });
+}
+async function loadSupabaseNotifications(){
+  if(!supabaseClient || !session?.id) return;
+  const {data:rows,error}=await supabaseClient.from('notifications')
+    .select('id,user_id,actor_id,type,reference_id,is_read,created_at')
+    .eq('user_id',session.id).order('created_at',{ascending:false}).limit(150);
+  if(error) throw error;
+  await loadNotificationActorProfiles((rows||[]).map(row=>row.actor_id));
+  DB.notifications[session.username]=(rows||[]).map(row=>({
+    id:row.id, type:row.type, fromUser:usernameForAuthId(row.actor_id),
+    referenceId:row.reference_id, read:!!row.is_read, createdAt:new Date(row.created_at).getTime()
+  }));
+}
+async function notify(toUser, type, fromUser, referenceId){
+  // Real post likes/comments are notified by Supabase database triggers.
+  // This avoids relying on a possibly stale local username-to-user-ID cache
+  // and prevents duplicate notifications from both the browser and database.
+  if(supabaseClient && session?.id) return;
+  if(toUser===fromUser) return;
+  if(!DB.notifications[toUser]) DB.notifications[toUser]=[];
+  DB.notifications[toUser].unshift({id:uid('n'), type, fromUser, referenceId, read:false, createdAt:Date.now()});
+  DB.notifications[toUser] = DB.notifications[toUser].slice(0,150);
+  await save('notifications');
+}
+let notificationRealtimeChannel=null;
+function subscribeToNotifications(){
+  if(!supabaseClient || !session?.id) return;
+  if(notificationRealtimeChannel) supabaseClient.removeChannel(notificationRealtimeChannel);
+  notificationRealtimeChannel=supabaseClient.channel('nyctophile-notifications-'+session.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+session.id},async payload=>{
+      const row=payload.new;
+      try{ await loadNotificationActorProfiles([row.actor_id]); }
+      catch(error){ console.error('Could not load notification profile:',error); }
+      const item={id:row.id,type:row.type,fromUser:usernameForAuthId(row.actor_id),referenceId:row.reference_id,read:!!row.is_read,createdAt:new Date(row.created_at).getTime()};
+      const list=(DB.notifications[session.username] ||= []);
+      if(!list.some(n=>n.id===item.id)) list.unshift(item);
+      toast((item.fromUser==='user_'+String(row.actor_id).slice(0,8)?'Someone':'@'+item.fromUser)+' '+(item.type==='friend_request'?'sent you a friend request 👥':item.type==='like'?'liked your post ❤️':item.type==='comment'?'commented on your post 💬':'sent you a notification'));
+      renderApp();
+    }).subscribe(status=>{if(status==='CHANNEL_ERROR') console.warn('Enable notifications in the supabase_realtime publication.');});
+}
+function unreadCount(){
+  if(!session) return 0;
+  const list = DB.notifications[session.username]||[];
+  return list.filter(n=>!n.read).length;
+}
+function unreadMessageCount(){
+  if(!session) return 0;
+  return Object.values(DB.messages).flat().filter(m=>m.receiverId===session.username && !m.readAt).length;
+}
+async function markConversationDelivered(messageId){
+  if(!session?.id || !supabaseClient) return;
+  try{
+    const deliveredAt=new Date().toISOString();
+    const {error}=await supabaseClient.from('messages').update({delivered_at:deliveredAt})
+      .eq('id',messageId).eq('receiver_id',session.id).is('delivered_at',null);
+    if(error) throw error;
+    for(const list of Object.values(DB.messages)){
+      const message=list.find(m=>m.id===messageId);
+      if(message && !message.deliveredAt) message.deliveredAt=deliveredAt;
+    }
+  }catch(err){ console.error('Could not mark message delivered:',err); }
+}
+async function markConversationRead(conversationId){
+  if(!session?.id || !supabaseClient) return;
+  try{
+    const {error}=await supabaseClient.from('messages').update({read_at:new Date().toISOString()})
+      .eq('conversation_id',conversationId).eq('receiver_id',session.id).is('read_at',null);
+    if(error) throw error;
+    (DB.messages[conversationId]||[]).forEach(m=>{if(m.receiverId===session.username && !m.readAt) m.readAt=new Date().toISOString();});
+    renderApp();
+  }catch(err){ console.error('Could not mark messages read:',err); }
+}
+let messageRealtimeChannel=null;
+let presenceChannel=null, typingChannel=null, onlineUserIds=new Set(), typingTimer=null, typingStopTimer=null, someoneTyping=false;
+function isUserOnline(username){ const id=DB.users[username]?.id; return !!id && onlineUserIds.has(id); }
+function subscribeToPresence(){
+  if(!supabaseClient || !session?.id) return;
+  if(presenceChannel) supabaseClient.removeChannel(presenceChannel);
+  presenceChannel=supabaseClient.channel('nyctophile-presence',{config:{presence:{key:session.id}}});
+  presenceChannel.on('presence',{event:'sync'},()=>{
+    onlineUserIds=new Set(Object.keys(presenceChannel.presenceState()||{}));
+    if(route.view==='messages' || route.view==='thread') renderApp();
+  }).subscribe(async status=>{
+    if(status==='SUBSCRIBED') await presenceChannel.track({user_id:session.id,username:session.username,online_at:new Date().toISOString()});
+  });
+}
+function subscribeToTyping(conversationId){
+  if(!supabaseClient || !session?.id) return;
+  if(typingChannel) supabaseClient.removeChannel(typingChannel);
+  someoneTyping=false;
+  typingChannel=supabaseClient.channel('nyctophile-typing-'+conversationId);
+  typingChannel.on('broadcast',{event:'typing'},({payload})=>{
+    if(payload?.user_id===session.id) return;
+    someoneTyping=!!payload?.is_typing;
+    const label=document.getElementById('typingLabel');
+    if(label) label.textContent=someoneTyping?'Typing…':'';
+  }).subscribe();
+}
+function sendTypingState(isTyping){
+  if(!typingChannel || !session?.id) return;
+  clearTimeout(typingStopTimer);
+  if(isTyping){
+    if(!typingTimer){ typingChannel.send({type:'broadcast',event:'typing',payload:{user_id:session.id,is_typing:true}}); typingTimer=setTimeout(()=>typingTimer=null,900); }
+    typingStopTimer=setTimeout(()=>{typingChannel?.send({type:'broadcast',event:'typing',payload:{user_id:session.id,is_typing:false}});},1400);
+  }else{ typingChannel.send({type:'broadcast',event:'typing',payload:{user_id:session.id,is_typing:false}}); }
+}
+
+function subscribeToMessageUpdates(){
+  if(!supabaseClient || !session?.id) return;
+  if(messageRealtimeChannel) supabaseClient.removeChannel(messageRealtimeChannel);
+  messageRealtimeChannel=supabaseClient.channel('nyctophile-messages-'+session.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+session.id},async payload=>{
+      try{
+        await loadSupabaseMessages();
+        const row=payload.new;
+        const sender=usernameForAuthId(row.sender_id);
+        await markConversationDelivered(row.id);
+        if(route.view==='thread' && route.params.id===row.conversation_id){ await markConversationRead(row.conversation_id); }
+        else { toast('New message from @'+sender+' 💬'); renderApp(); }
+      }catch(err){ console.error('New message update failed:',err); }
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:'sender_id=eq.'+session.id},async()=>{
+      try{ await loadSupabaseMessages(); if(route.view==='thread' || route.view==='messages') renderApp(); }
+      catch(err){ console.error('Message status refresh failed:',err); }
+    }).subscribe(status=>{ if(status==='CHANNEL_ERROR') console.warn('Supabase Realtime is not enabled for the messages table.'); });
+}
+
+/* ================= AUTH ================= */
+function profileToUser(profile, email=''){
+  const username = profile?.username || ('user_' + String(profile?.id||'').slice(0,8));
+  return {
+    username,
+    name: profile?.display_name || username,
+    email,
+    avatar: profile?.avatar_url || null,
+    bio: profile?.bio || '',
+    createdAt: profile?.created_at ? new Date(profile.created_at).getTime() : Date.now(),
+    role: 'member',
+    id: profile?.id
+  };
+}
+async function loadSupabaseProfile(authUser){
+  const {data, error} = await supabaseClient.from('profiles')
+    .select('id, username, display_name, bio, avatar_url, created_at')
+    .eq('id', authUser.id).maybeSingle();
+  if(error) throw error;
+  if(!data) throw new Error('Your account was created, but its profile was not found. Check the Supabase signup trigger.');
+  const user = profileToUser(data, authUser.email || '');
+  DB.users[user.username] = user;
+  DB.follows[user.username] ||= {followers:[], following:[]};
+  session = {username:user.username, id:authUser.id};
+  return user;
+}
+function showAuthError(message){
+  uiState.authError = message || 'Something went wrong. Please try again.';
+  renderApp();
+}
+async function handleSignup(e){
+  e.preventDefault();
+  const form=e.currentTarget;
+  const button=form.querySelector('button[type="submit"]');
+  const name=form.elements['name'].value.trim();
+  const username=form.elements['username'].value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'');
+  const email=form.elements['email'].value.trim().toLowerCase();
+  const pass=form.elements['password'].value;
+  const confirm=form.elements['confirm'].value;
+  uiState.authError='';
+  if(!supabaseClient){ showAuthError('Cannot connect to Supabase. Check your internet connection and reload the page.'); return; }
+  if(!name||!username||!email||!pass){ showAuthError('Please fill in every required field.'); return; }
+  if(username.length<3){ showAuthError('Username must be at least 3 characters.'); return; }
+  if(pass.length<6){ showAuthError('Password must be at least 6 characters.'); return; }
+  if(pass!==confirm){ showAuthError("Passwords don't match."); return; }
+  if(button){button.disabled=true;button.textContent='Creating account…';}
+  try{
+    const {data:existing, error:checkError}=await supabaseClient.from('profiles').select('id').eq('username',username).maybeSingle();
+    if(checkError) throw checkError;
+    if(existing) throw new Error('That username is already taken. Please choose another.');
+    const {data,error}=await supabaseClient.auth.signUp({
+      email,
+      password:pass,
+      options:{data:{username,display_name:name}}
+    });
+    if(error) throw error;
+    if(data.user && data.session){
+      await loadSupabaseProfile(data.user);
+      await loadSupabasePosts();
+      await loadSupabaseGroups();
+      await loadSupabaseMessages();
+      await loadSupabaseNotifications(); subscribeToNotifications();
+      toast('Welcome to Nyctophile, '+name.split(' ')[0]+' 🌙');
+      go('home');
+    } else if(data.user){
+      uiState.authError='Account created! Please check your email and confirm your address, then log in.';
+      renderApp();
+    } else {
+      throw new Error('Supabase did not return an account. Please try again.');
+    }
+  }catch(err){
+    console.error('NYCTOPHILE signup error:',err);
+    showAuthError(err.message || 'Unable to create your account.');
+  }finally{
+    const current=document.querySelector('.authcard button[type="submit"]');
+    if(current){current.disabled=false;current.textContent='Create account';}
+  }
+}
+async function handleLogin(e){
+  e.preventDefault();
+  const form=e.currentTarget;
+  const button=form.querySelector('button[type="submit"]');
+  const identifier=form.elements['identifier'].value.trim();
+  const pass=form.elements['password'].value;
+  uiState.authError='';
+  if(!supabaseClient){ showAuthError('Cannot connect to Supabase. Check your internet connection and reload the page.'); return; }
+  if(button){button.disabled=true;button.textContent='Logging in…';}
+  try{
+    let email=identifier;
+    if(!identifier.includes('@')){
+      const {data,error}=await supabaseClient.from('profiles').select('id, username').eq('username',identifier.toLowerCase()).maybeSingle();
+      if(error) throw error;
+      if(!data) throw new Error('No account found with that username.');
+      throw new Error('Please log in using the email address you registered with.');
+    }
+    const {data,error}=await supabaseClient.auth.signInWithPassword({email:email.toLowerCase(),password:pass});
+    if(error) throw error;
+    await loadSupabaseProfile(data.user);
+    await loadSupabasePosts();
+    await loadSupabaseGroups();
+    await loadSupabaseMessages();
+    toast('Welcome back!');
+    go('home');
+  }catch(err){
+    console.error('NYCTOPHILE login error:',err);
+    showAuthError(err.message || 'Unable to log in.');
+  }finally{
+    const current=document.querySelector('.authcard button[type="submit"]');
+    if(current){current.disabled=false;current.textContent='Log in';}
+  }
+}
+async function handleLogout(){
+  try{ if(supabaseClient) { const {error}=await supabaseClient.auth.signOut(); if(error) throw error; } }
+  catch(err){ console.error('NYCTOPHILE logout error:',err); toast('Could not log out. Please try again.'); return; }
+  session=null; go('landing');
+}
+
+/* ================= POSTS — Supabase ================= */
+function dataUrlToBlob(dataUrl){
+  const parts=dataUrl.split(',');
+  const mime=(parts[0].match(/:(.*?);/)||[])[1]||'image/jpeg';
+  const binary=atob(parts[1]);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  return new Blob([bytes],{type:mime});
+}
+async function loadSupabasePosts(){
+  if(!supabaseClient) return;
+  const {data:rows,error}=await supabaseClient.from('posts')
+    .select('id,user_id,caption,image_url,image_urls,hashtags,category,created_at')
+    .order('created_at',{ascending:false}).limit(100);
+  if(error) throw error;
+  const {data:profiles, error:profileError}=await supabaseClient.from('profiles')
+    .select('id,username,display_name,avatar_url,bio');
+  if(profileError) throw profileError;
+  const byId={};
+  (profiles||[]).forEach(p=>{ byId[p.id]=p; const u=profileToUser(p); DB.users[u.username]=u; });
+  DB.posts={};
+  (rows||[]).forEach(row=>{
+    const profile=byId[row.user_id];
+    const username=profile?.username || ('user_'+String(row.user_id).slice(0,8));
+    const images=Array.isArray(row.image_urls)&&row.image_urls.length ? row.image_urls : (row.image_url?[row.image_url]:[]);
+    DB.posts[row.id]={id:row.id,userId:username,images,caption:row.caption||'',hashtags:row.hashtags||[],category:row.category||'Other',createdAt:new Date(row.created_at).getTime(),groupId:null};
+  });
+
+  // Hydrate likes and comments from Supabase so they persist across devices.
+  const [{data:likeRows,error:likeError},{data:commentRows,error:commentError}] = await Promise.all([
+    supabaseClient.from('likes').select('post_id,user_id'),
+    supabaseClient.from('comments').select('id,post_id,user_id,content,created_at')
+  ]);
+  if(likeError) throw likeError;
+  if(commentError) throw commentError;
+  DB.likes={};
+  (likeRows||[]).forEach(row=>{
+    const username=byId[row.user_id]?.username || ('user_'+String(row.user_id).slice(0,8));
+    (DB.likes[row.post_id] ||= []).push(username);
+  });
+  DB.comments={};
+  (commentRows||[]).forEach(row=>{
+    const username=byId[row.user_id]?.username || ('user_'+String(row.user_id).slice(0,8));
+    DB.comments[row.id]={id:row.id,postId:row.post_id,userId:username,content:row.content||'',createdAt:new Date(row.created_at).getTime(),parentId:null,likes:[]};
+  });
+
+  // Load real follower relationships from Supabase.
+  const {data:followRows,error:followError}=await supabaseClient.from('follows')
+    .select('follower_id,following_id');
+  if(followError) throw followError;
+  DB.follows={};
+  Object.keys(DB.users).forEach(name=>DB.follows[name]={followers:[],following:[]});
+  (followRows||[]).forEach(row=>{
+    const follower=byId[row.follower_id]?.username;
+    const following=byId[row.following_id]?.username;
+    if(!follower || !following) return;
+    (DB.follows[follower] ||= {followers:[],following:[]}).following.push(following);
+    (DB.follows[following] ||= {followers:[],following:[]}).followers.push(follower);
+  });
+
+}
+async function createPost({images, caption, hashtags, category, groupId}){
+  if(!session?.id || !supabaseClient) throw new Error('Please log in before publishing.');
+  const uploaded=[];
+  for(let i=0;i<images.length;i++){
+    const blob=dataUrlToBlob(images[i]);
+    const path=`${session.id}/${Date.now()}-${i}.jpg`;
+    const {error:uploadError}=await supabaseClient.storage.from('post-images').upload(path,blob,{contentType:'image/jpeg',upsert:false});
+    if(uploadError) throw uploadError;
+    const {data:publicData}=supabaseClient.storage.from('post-images').getPublicUrl(path);
+    uploaded.push(publicData.publicUrl);
+  }
+  if(groupId){
+    const {data,error}=await supabaseClient.from('group_posts').insert({group_id:groupId,user_id:session.id,content:caption||'',image_url:uploaded[0]||null})
+      .select('id,group_id,user_id,content,image_url,created_at').single();
+    if(error) throw error;
+    const post={id:data.id,userId:session.username,images:data.image_url?[data.image_url]:[],caption:data.content||'',hashtags:hashtags||[],category:category||'Other',createdAt:new Date(data.created_at).getTime(),groupId:data.group_id};
+    DB.groupPosts[post.id]=post; DB.likes[post.id]=[];
+    toast('Group post published ✨');
+    return post.id;
+  }
+  const payload={user_id:session.id,caption:caption||'',image_url:uploaded[0]||null,image_urls:uploaded,hashtags:hashtags||[],category:category||'Other'};
+  const {data,error}=await supabaseClient.from('posts').insert(payload)
+    .select('id,user_id,caption,image_url,image_urls,hashtags,category,created_at').single();
+  if(error) throw error;
+  const post={id:data.id,userId:session.username,images:uploaded,caption:data.caption||'',hashtags:data.hashtags||[],category:data.category||'Other',createdAt:new Date(data.created_at).getTime(),groupId:null};
+  DB.posts[post.id]=post;
+  DB.likes[post.id]=[];
+  toast('Posted ✨');
+  return post.id;
+}
+function postStore(post){ return post.groupId ? DB.groupPosts : DB.posts; }
+async function toggleLike(postId, animEl){
+  const post = DB.posts[postId] || DB.groupPosts[postId];
+  if(!post || !session?.id) return;
+  const arr = DB.likes[postId] || (DB.likes[postId]=[]);
+  const i = arr.indexOf(session.username);
+  try{
+    if(DB.posts[postId]){
+      if(i>=0){
+        const {error}=await supabaseClient.from('likes').delete()
+          .eq('post_id',postId).eq('user_id',session.id);
+        if(error) throw error;
+        arr.splice(i,1);
+      }else{
+        const {error}=await supabaseClient.from('likes').insert({post_id:postId,user_id:session.id});
+        if(error) throw error;
+        arr.push(session.username);
+        notify(post.userId, 'like', session.username, postId);
+        if(animEl) burstHeart(animEl);
+      }
+    }else{
+      if(i>=0) arr.splice(i,1);
+      else { arr.push(session.username); notify(post.userId, 'like', session.username, postId); if(animEl) burstHeart(animEl); }
+      await save('likes');
+    }
+    renderApp();
+  }catch(err){
+    console.error('Like error:',err);
+    toast('Could not update like: '+(err.message||'Please try again.'));
+  }
+}
+// Mobile double-tap (and desktop double-click) to like a post image.
+const postTapTimes = new WeakMap();
+function handlePostTouch(event, postId){
+  const now = Date.now();
+  const previous = postTapTimes.get(event.currentTarget) || 0;
+  postTapTimes.set(event.currentTarget, now);
+  if(now - previous < 330){
+    event.preventDefault();
+    doubleTapLike(postId, event.currentTarget);
+  }
+}
+function doubleTapLike(postId, mediaEl){
+  const likedBy = DB.likes[postId] || [];
+  // A double tap should never remove an existing like.
+  if(!likedBy.includes(session?.username)) toggleLike(postId, mediaEl);
+  else if(mediaEl) burstHeart(mediaEl);
+}
+function burstHeart(container){
+  const pop = document.createElement('div');
+  pop.className='heart-pop';
+  pop.innerHTML = ICONS.heartFill.replace('currentColor','#FF6B7A');
+  container.appendChild(pop);
+  setTimeout(()=>pop.remove(), 700);
+}
+async function toggleSave(postId){
+  const list = DB.saves[session.username] || (DB.saves[session.username]=[]);
+  const i = list.indexOf(postId);
+  if(i>=0) list.splice(i,1); else { list.push(postId); toast('Saved to your collection 🔖'); }
+  await save('saves');
+  renderApp();
+}
+async function deletePost(postId, isGroup){
+  const post = isGroup ? DB.groupPosts[postId] : DB.posts[postId];
+  if(!post || !session?.id || !supabaseClient){ toast('Please log in to delete this post.'); return; }
+  if(!confirm('Delete this post? This cannot be undone.')) return;
+  try{
+    // Delete from Supabase first so the post is removed for every visitor.
+    const table = isGroup ? 'group_posts' : 'posts';
+    let query = supabaseClient.from(table).delete().eq('id',postId);
+    if(!isGroup) query = query.eq('user_id',session.id);
+    const {data,error}=await query.select('id').maybeSingle();
+    if(error) throw error;
+    if(!data){ toast('Post was not deleted. Check that you own this post and that its delete permission is enabled.'); return; }
+
+    // Remove it from the local view only after the database confirms deletion.
+    if(isGroup) delete DB.groupPosts[postId]; else delete DB.posts[postId];
+    delete DB.likes[postId];
+    Object.keys(DB.comments).forEach(cid=>{ if(DB.comments[cid].postId===postId) delete DB.comments[cid]; });
+    toast('Post deleted successfully.');
+    if(isGroup) go('groupDetail',{id:post.groupId}); else go('home');
+  }catch(err){
+    console.error('Delete post error:',err);
+    toast('Could not delete post: '+(err.message||'Please try again.'));
+  }
+}
+async function addComment(postId, text, parentId=null){
+  if(!text.trim() || !session?.id) return;
+  const post = DB.posts[postId]||DB.groupPosts[postId];
+  try{
+    if(DB.posts[postId]){
+      const {data,error}=await supabaseClient.from('comments')
+        .insert({post_id:postId,user_id:session.id,content:text.trim()})
+        .select('id,post_id,user_id,content,created_at').single();
+      if(error) throw error;
+      DB.comments[data.id]={id:data.id,postId:data.post_id,userId:session.username,content:data.content,createdAt:new Date(data.created_at).getTime(),parentId:null,likes:[]};
+    }else{
+      const id=uid('c');
+      DB.comments[id]={id,postId,userId:session.username,content:text.trim(),createdAt:Date.now(),parentId,likes:[]};
+      await save('comments');
+    }
+    if(post) notify(post.userId,'comment',session.username,postId);
+    renderApp();
+  }catch(err){
+    console.error('Comment error:',err);
+    toast('Could not add comment: '+(err.message||'Please try again.'));
+  }
+}
+async function deleteComment(id){
+  const comment=DB.comments[id]; if(!comment) return;
+  try{
+    if(DB.posts[comment.postId]){
+      const {error}=await supabaseClient.from('comments').delete().eq('id',id).eq('user_id',session.id);
+      if(error) throw error;
+    }else{
+      await save('comments');
+    }
+    delete DB.comments[id];
+    renderApp();
+  }catch(err){ console.error('Delete comment error:',err); toast('Could not delete comment.'); }
+}
+async function toggleCommentLike(id){
+  const c = DB.comments[id]; if(!c) return;
+  const i = c.likes.indexOf(session.username);
+  if(i>=0) c.likes.splice(i,1); else c.likes.push(session.username);
+  await save('comments'); renderApp();
+}
+function postComments(postId){
+  return Object.values(DB.comments).filter(c=>c.postId===postId).sort((a,b)=>a.createdAt-b.createdAt);
+}
+function sharePost(postId){
+  if(!session?.id){ toast('Please log in to share a post.'); return; }
+  const post=DB.posts[postId] || DB.groupPosts[postId];
+  if(!post){ toast('Post not found.'); return; }
+  const mineFollowing=DB.follows?.[session.username]?.following||[];
+  const myFollowers=DB.follows?.[session.username]?.followers||[];
+  const names=[...new Set([...mineFollowing,...myFollowers])].filter(name=>name!==session.username && DB.users[name]?.id);
+  const list=names.sort((a,b)=>(DB.users[a]?.name||a).localeCompare(DB.users[b]?.name||b));
+  openModal(`
+    <h3>Share this post ✉️</h3>
+    <p class="muted" style="font-size:13px;margin:-8px 0 12px">Choose people who follow you or whom you follow.</p>
+    ${list.length?`
+      <div class="share-list">
+        <label class="share-recipient" style="border-bottom:1px solid var(--line)">
+          <input type="checkbox" id="share-select-all" onchange="document.querySelectorAll('.share-person').forEach(x=>x.checked=this.checked)">
+          <span class="share-name"><b>Select everyone</b></span>
+        </label>
+        ${list.map(name=>`<label class="share-recipient">
+          <input class="share-person" type="checkbox" value="${esc(name)}">
+          ${avatarHTML(name,36)}
+          <span class="share-name"><b>${esc(DB.users[name]?.name||name)}</b><br><span class="share-handle">@${esc(name)}</span></span>
+        </label>`).join('')}
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="sendPostToSelected('${esc(String(postId))}')">Send post</button>
+    `:`<div class="empty" style="padding:28px 12px"><div class="moon">👥</div>No followers or following yet.</div>`}
+    <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="copyPostLink('${esc(String(postId))}')">🔗 Copy post link</button>
+  `);
+}
+async function sendPostToSelected(postId){
+  if(!supabaseClient || !session?.id){ toast('Please log in again.'); return; }
+  const selected=[...document.querySelectorAll('.share-person:checked')].map(input=>input.value);
+  if(!selected.length){ toast('Choose at least one person.'); return; }
+  const button=modalRoot?.querySelector('.btn-primary');
+  if(button){button.disabled=true;button.textContent='Sending…';}
+  try{
+    const rows=selected.map(username=>({
+      sender_id:session.id,
+      recipient_id:DB.users[username]?.id,
+      post_id:String(postId)
+    }));
+    if(rows.some(row=>!row.recipient_id)) throw new Error('Could not identify one of the selected users. Please reload and try again.');
+    const {error}=await supabaseClient.from('shared_posts').insert(rows);
+    if(error) throw error;
+    // Also create a real chat message so the share appears in the recipient's inbox.
+    const postUrl=location.href.split('#')[0]+'#/post/'+encodeURIComponent(String(postId));
+    const messageRows=selected.map(username=>({
+      conversation_id:conversationIdFor(session.username,username),
+      sender_id:session.id,
+      receiver_id:DB.users[username].id,
+      content:'[[NYCTOPHILE_POST:'+String(postId)+']]'
+    }));
+    const {error:messageError}=await supabaseClient.from('messages').insert(messageRows);
+    if(messageError) throw messageError;
+    closeModal();
+    toast(`Post shared with ${selected.length} ${selected.length===1?'person':'people'}! ✨`);
+    await loadSupabaseMessages();
+    if(route.view==='messages' || route.view==='thread') renderApp();
+  }catch(error){
+    console.error('Post sharing failed:',error);
+    if(button){button.disabled=false;button.textContent='Send post';}
+    toast(error.message||'Could not share this post.');
+  }
+}
+async function copyPostLink(postId){
+  const url=location.href.split('#')[0]+'#/post/'+postId;
+  try{await navigator.clipboard.writeText(url);toast('Post link copied 🔗');}
+  catch(error){toast('Copy unavailable. Post link: '+url);}
+}
+
+/* ================= FOLLOW / UNFOLLOW ================= */
+function isFollowing(target){ return (DB.follows?.[session?.username]?.following||[]).includes(target); }
+function followButton(target){
+  return isFollowing(target)
+    ? `<button class="btn btn-ghost btn-sm" onclick="unfollowUser('${target}')">Unfollow</button>`
+    : `<button class="btn btn-primary btn-sm" onclick="followUser('${target}')">Follow</button>`;
+}
+async function refreshFollows(){ await loadSupabasePosts(); }
+async function followUser(target){
+  const person=DB.users[target];
+  if(!session?.id || !person?.id || target===session.username || !supabaseClient) return;
+  if(isFollowing(target)) return;
+  try{
+    const {error}=await supabaseClient.from('follows').insert({follower_id:session.id,following_id:person.id});
+    if(error) throw error;
+    await refreshFollows(); renderApp(); toast('You are now following @'+target+'.');
+  }catch(e){ console.error(e); toast(e.message||'Could not follow this user.'); }
+}
+async function unfollowUser(target){
+  const person=DB.users[target];
+  if(!session?.id || !person?.id || !supabaseClient || !isFollowing(target)) return;
+  if(!confirm('Unfollow @'+target+'?')) return;
+  try{
+    const {error}=await supabaseClient.from('follows').delete().eq('follower_id',session.id).eq('following_id',person.id);
+    if(error) throw error;
+    await refreshFollows(); renderApp(); toast('You unfollowed @'+target+'.');
+  }catch(e){ console.error(e); toast(e.message||'Could not unfollow this user.'); }
+}
+function openFollowList(username,kind){ go('followList',{username,kind}); }
+function renderFollowList(username,kind){
+  const user=DB.users[username]; if(!user) return `<div class="empty">User not found.</div>`;
+  const names=DB.follows?.[username]?.[kind]||[];
+  const title=kind==='followers'?'Followers':'Following';
+  return `<div class="pagehead"><button class="btn btn-ghost btn-sm" onclick="go('profile',{username:'${username}'})">← Back to profile</button><h2 style="margin-top:18px">${title}</h2><div class="faint">${names.length} ${title.toLowerCase()}</div></div><div class="card" style="padding:8px 16px;margin-top:14px">${names.length?names.map(name=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 0">${avatarHTML(name,44)}<div style="flex:1">${esc(DB.users[name]?.name||name)}<div class="faint">@${esc(name)}</div></div></div>`).join(''):'<div class="empty">No '+title.toLowerCase()+' yet.</div>'}</div>`;
+}
+
+/* ================= GROUPS ================= */
+async function loadSupabaseGroupPosts(){
+  if(!supabaseClient || !session?.id) return;
+  const {data:rows,error}=await supabaseClient.from('group_posts')
+    .select('id,group_id,user_id,content,image_url,created_at')
+    .order('created_at',{ascending:false}).limit(200);
+  if(error) throw error;
+  const userIds=[...new Set((rows||[]).map(r=>r.user_id).filter(Boolean))];
+  const knownIds=new Set(Object.values(DB.users).map(u=>u.id).filter(Boolean));
+  const missing=userIds.filter(id=>!knownIds.has(id));
+  if(missing.length){
+    const {data:profiles,error:profileError}=await supabaseClient.from('profiles')
+      .select('id,username,display_name,avatar_url,bio').in('id',missing);
+    if(profileError) throw profileError;
+    (profiles||[]).forEach(p=>{const u=profileToUser(p);DB.users[u.username]=u;});
+  }
+  const usernameById={}; Object.values(DB.users).forEach(u=>{if(u.id) usernameById[u.id]=u.username;});
+  DB.groupPosts={};
+  (rows||[]).forEach(r=>{
+    const username=usernameById[r.user_id]||(r.user_id===session.id?session.username:'user_'+String(r.user_id).slice(0,8));
+    DB.groupPosts[r.id]={id:r.id,userId:username,images:r.image_url?[r.image_url]:[],caption:r.content||'',hashtags:[],category:'Other',createdAt:new Date(r.created_at).getTime(),groupId:r.group_id};
+  });
+}
+
+async function loadSupabaseGroups(){
+  if(!supabaseClient || !session?.id) return;
+  const [{data:groupRows,error:groupError},{data:memberRows,error:memberError}] = await Promise.all([
+    supabaseClient.from('groups').select('id,name,description,cover_image_url,category,privacy,owner_id,created_at').order('created_at',{ascending:false}),
+    supabaseClient.from('group_members').select('group_id,user_id,role,status,joined_at')
+  ]);
+  if(groupError) throw groupError;
+  if(memberError) throw memberError;
+  const memberIds=[...new Set((memberRows||[]).map(m=>m.user_id).filter(Boolean))];
+  const missing=memberIds.filter(id=>!Object.values(DB.users).some(u=>u.id===id));
+  if(missing.length){
+    const {data:profiles,error:profileError}=await supabaseClient.from('profiles')
+      .select('id,username,display_name,bio,avatar_url,created_at').in('id',missing);
+    if(profileError) throw profileError;
+    (profiles||[]).forEach(profile=>{const user=profileToUser(profile);DB.users[user.username]=user;});
+  }
+  const usernameById={};
+  Object.values(DB.users).forEach(u=>{if(u.id) usernameById[u.id]=u.username;});
+  const activeByGroup={},pendingByGroup={};
+  (memberRows||[]).forEach(m=>{
+    const username=usernameById[m.user_id]||(m.user_id===session.id?session.username:'user_'+String(m.user_id).slice(0,8));
+    const item={username,role:m.role};
+    if(m.status==='active') (activeByGroup[m.group_id] ||= []).push(item);
+    if(m.status==='pending') (pendingByGroup[m.group_id] ||= []).push(username);
+  });
+  DB.groups={};
+  (groupRows||[]).forEach(row=>{
+    const ownerName=usernameById[row.owner_id] || (row.owner_id===session.id?session.username:'user_'+String(row.owner_id).slice(0,8));
+    DB.groups[row.id]={id:row.id,name:row.name,description:row.description||'',image:row.cover_image_url||'',category:row.category||'Other',privacy:row.privacy,ownerId:ownerName,createdAt:new Date(row.created_at).getTime(),members:activeByGroup[row.id]||[],pendingRequests:pendingByGroup[row.id]||[]};
+  });
+  await loadSupabaseGroupPosts();
+}
+async function createGroup({name, description, image, category, privacy}){
+  if(!session?.id || !supabaseClient) throw new Error('Please log in before creating a group.');
+  let coverUrl=null;
+  if(image){
+    const blob=dataUrlToBlob(image);
+    const path=`groups/${session.id}/${Date.now()}.jpg`;
+    const {error:uploadError}=await supabaseClient.storage.from('post-images').upload(path,blob,{contentType:'image/jpeg',upsert:false});
+    if(uploadError) throw uploadError;
+    const {data:publicData}=supabaseClient.storage.from('post-images').getPublicUrl(path);
+    coverUrl=publicData.publicUrl;
+  }
+  const {data,error}=await supabaseClient.from('groups').insert({
+    name,description:description||'',cover_image_url:coverUrl,category:category||'Other',privacy:privacy||'public',owner_id:session.id
+  }).select('id,name,description,cover_image_url,category,privacy,owner_id,created_at').single();
+  if(error) throw error;
+  await loadSupabaseGroups();
+  toast('Group created 🌙');
+  return data.id;
+}
+function isMember(group, username){ return group.members.some(m=>m.username===username); }
+function memberRole(group, username){ const m=group.members.find(m=>m.username===username); return m?m.role:null; }
+async function groupUserId(username){
+  const cached=DB.users[username]?.id;
+  if(cached) return cached;
+  const {data,error}=await supabaseClient.from('profiles').select('id,username,display_name,bio,avatar_url,created_at').eq('username',username).maybeSingle();
+  if(error) throw error;
+  if(!data) return null;
+  const user=profileToUser(data); DB.users[user.username]=user; return user.id;
+}
+async function joinGroup(id){
+  try{
+    const g=DB.groups[id]; if(!g||!session?.id) return;
+    if(isMember(g,session.username)){toast('You are already a member.');return;}
+    const status=g.privacy==='private'?'pending':'active';
+    const {error}=await supabaseClient.from('group_members').insert({group_id:id,user_id:session.id,role:'member',status});
+    if(error) throw error;
+    await loadSupabaseGroups(); renderApp();
+    toast(status==='pending'?'Join request sent.':'Joined '+g.name);
+  }catch(error){console.error(error);toast(error.message||'Could not join this group.');}
+}
+async function leaveGroup(id){
+  try{
+    const {error}=await supabaseClient.from('group_members').delete().eq('group_id',id).eq('user_id',session.id);
+    if(error) throw error;
+    await loadSupabaseGroups(); renderApp(); toast('You left the group.');
+  }catch(error){console.error(error);toast(error.message||'Could not leave this group.');}
+}
+async function approveRequest(gid, username, approve){
+  try{
+    const userId=await groupUserId(username); if(!userId) throw new Error('Could not find that user.');
+    let result;
+    if(approve) result=await supabaseClient.from('group_members').update({status:'active'}).eq('group_id',gid).eq('user_id',userId).eq('status','pending');
+    else result=await supabaseClient.from('group_members').delete().eq('group_id',gid).eq('user_id',userId).eq('status','pending');
+    if(result.error) throw result.error;
+    await loadSupabaseGroups(); renderApp(); toast(approve?'Membership approved.':'Request declined.');
+  }catch(error){console.error(error);toast(error.message||'Could not update request.');}
+}
+async function removeMember(gid, username, ban=false){
+  try{
+    const userId=await groupUserId(username); if(!userId) throw new Error('Could not find that user.');
+    const {error}=await supabaseClient.from('group_members').delete().eq('group_id',gid).eq('user_id',userId);
+    if(error) throw error;
+    await loadSupabaseGroups(); renderApp(); toast(ban?username+' was removed from the group.':username+' was removed.');
+  }catch(error){console.error(error);toast(error.message||'Could not remove member.');}
+}
+async function setModerator(gid, username, role){
+  try{
+    const userId=await groupUserId(username); if(!userId) throw new Error('Could not find that user.');
+    const {error}=await supabaseClient.from('group_members').update({role}).eq('group_id',gid).eq('user_id',userId);
+    if(error) throw error;
+    await loadSupabaseGroups(); renderApp(); toast('Member role updated.');
+  }catch(error){console.error(error);toast(error.message||'Could not update member role.');}
+}
+async function addGroupMember(gid){
+  try{
+    const input=document.getElementById('add-group-member-'+gid);
+    const username=(input?.value||'').trim().replace(/^@/,'').toLowerCase();
+    if(!username){toast('Enter a username first.');return;}
+    const userId=await groupUserId(username);
+    if(!userId){toast('No user found with that username.');return;}
+    if(userId===session.id){toast('You are already the group owner.');return;}
+    const {error}=await supabaseClient.from('group_members').insert({group_id:gid,user_id:userId,role:'member',status:'active'});
+    if(error) throw error;
+    await loadSupabaseGroups(); renderApp(); toast('@'+username+' was added to the group.');
+  }catch(error){console.error(error);toast(error.message||'Could not add this member.');}
+}
+
+/* ================= MESSAGES — Supabase ================= */
+function conversationIdFor(a,b){ return [a,b].sort().join('__'); }
+function usernameForAuthId(authId){
+  return Object.values(DB.users).find(u=>u.id===authId)?.username || ('user_'+String(authId).slice(0,8));
+}
+async function loadSupabaseMessages(){
+  if(!supabaseClient || !session?.id) return;
+  const {data:rows,error}=await supabaseClient.from('messages')
+    .select('id,conversation_id,sender_id,receiver_id,content,created_at,delivered_at,read_at')
+    .or(`sender_id.eq.${session.id},receiver_id.eq.${session.id}`)
+    .order('created_at',{ascending:true});
+  if(error) throw error;
+  DB.messages={};
+  DB.conversations={};
+  (rows||[]).forEach(row=>{
+    const sender=usernameForAuthId(row.sender_id);
+    const receiver=usernameForAuthId(row.receiver_id);
+    const id=row.conversation_id || conversationIdFor(sender,receiver);
+    const participants=[sender,receiver];
+    if(!DB.conversations[id]) DB.conversations[id]={id,participants,updatedAt:new Date(row.created_at).getTime()};
+    DB.conversations[id].updatedAt=new Date(row.created_at).getTime();
+    (DB.messages[id] ||= []).push({id:row.id,senderId:sender,receiverId:receiver,content:row.content,createdAt:new Date(row.created_at).getTime(),deliveredAt:row.delivered_at,readAt:row.read_at});
+  });
+  // Preload every shared post referenced in chats so recipients see its photo
+  // immediately when they open the conversation, even if it is not in their feed.
+  const sharedPostIds=[...new Set((rows||[]).map(row=>{
+    const match=String(row.content||'').match(/^\[\[NYCTOPHILE_POST:(.+)\]\]$/);
+    return match?match[1]:null;
+  }).filter(Boolean))].filter(id=>!DB.posts?.[id] && !DB.groupPosts?.[id]);
+  if(sharedPostIds.length){
+    const {data:sharedRows,error:sharedError}=await supabaseClient.from('posts')
+      .select('id,user_id,caption,image_url,image_urls,hashtags,category,created_at')
+      .in('id',sharedPostIds);
+    if(sharedError) throw sharedError;
+    const ownerIds=[...new Set((sharedRows||[]).map(post=>post.user_id).filter(Boolean))];
+    let ownerProfiles=[];
+    if(ownerIds.length){
+      const {data:profiles,error:profilesError}=await supabaseClient.from('profiles')
+        .select('id,username,display_name,avatar_url,bio').in('id',ownerIds);
+      if(profilesError) throw profilesError;
+      ownerProfiles=profiles||[];
+    }
+    const profilesById=Object.fromEntries(ownerProfiles.map(profile=>[profile.id,profile]));
+    (sharedRows||[]).forEach(row=>{
+      const profile=profilesById[row.user_id];
+      if(profile){const owner=profileToUser(profile);DB.users[owner.username]=owner;}
+      const username=profile?.username||('user_'+String(row.user_id).slice(0,8));
+      const images=Array.isArray(row.image_urls)&&row.image_urls.length?row.image_urls:(row.image_url?[row.image_url]:[]);
+      DB.posts[row.id]={id:row.id,userId:username,images,caption:row.caption||'',hashtags:row.hashtags||[],category:row.category||'Other',createdAt:new Date(row.created_at).getTime(),groupId:null};
+    });
+  }
+  const {data:streakRows,error:streakError}=await supabaseClient.from('chat_streaks')
+    .select('conversation_id,streak_count,last_mutual_date,user_one_id,user_two_id')
+    .or(`user_one_id.eq.${session.id},user_two_id.eq.${session.id}`);
+  if(streakError) throw streakError;
+  DB.chatStreaks={};
+  (streakRows||[]).forEach(row=>{ DB.chatStreaks[row.conversation_id]=row; });
+  const nowForMonth=new Date();
+  const monthStart=nowForMonth.getFullYear()+'-'+String(nowForMonth.getMonth()+1).padStart(2,'0')+'-01';
+  const {data:usage,error:usageError}=await supabaseClient.from('chat_streak_restore_usage')
+    .select('cards_used').eq('user_id',session.id).eq('month_start',monthStart).maybeSingle();
+  if(usageError) throw usageError;
+  DB.chatStreakRestoreUsage=usage||{cards_used:0};
+}
+function chatStreakBadge(conversationId){
+  const row=DB.chatStreaks?.[conversationId];
+  if(!row || !row.last_mutual_date) return '';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const last=new Date(row.last_mutual_date+'T00:00:00');
+  const days=Math.floor((today-last)/86400000);
+  const count=days<=1 ? Number(row.streak_count||0) : 0;
+  if(count<=0) return '';
+  const milestone=[300,200,100,30].find(n=>count>=n);
+  const badgeClass=milestone?`streak-milestone streak-${milestone}`:'';
+  const title=milestone?`${milestone}-day milestone! Keep the streak alive.`:`${count} day chat streak`;
+  return `<span class="${badgeClass}" title="${title}" style="display:inline-flex;align-items:center;gap:3px;font-weight:700;color:#f08b32"><span class="streak-flame">🔥</span> ${count}${milestone?` <small style="font-size:10px;letter-spacing:.2px">${milestone}-DAY!</small>`:''}</span>`;
+}
+function streakRestorePanel(conversationId){
+  const row=DB.chatStreaks?.[conversationId];
+  if(!row?.last_mutual_date || Number(row.streak_count||0)<=0) return '';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const last=new Date(row.last_mutual_date+'T00:00:00');
+  const days=Math.floor((today-last)/86400000);
+  if(days<2 || days>3) return '';
+  const used=Number(DB.chatStreakRestoreUsage?.cards_used||0);
+  const remaining=Math.max(0,5-used);
+  return `<div class="card" style="margin:0 0 12px;padding:12px 14px;border:1px solid rgba(240,139,50,.35);background:var(--surface-2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div><div style="font-weight:700;color:#f08b32">🔥 Your ${Number(row.streak_count)}-day streak was lost</div><div class="faint" style="font-size:12px;margin-top:3px">Restore it within 2 days · ${remaining} of 5 restore cards left this month</div></div>
+      <button class="btn btn-primary btn-sm" ${remaining===0?'disabled':''} onclick="restoreChatStreak('${esc(conversationId)}')">↻ Restore streak</button>
+    </div>
+  </div>`;
+}
+async function restoreChatStreak(conversationId){
+  try{
+    const {data,error}=await supabaseClient.rpc('restore_chat_streak',{p_conversation_id:conversationId});
+    if(error) throw error;
+    toast(`🔥 Streak restored! ${data.cards_remaining} restore cards left this month.`);
+    await loadSupabaseMessages(); renderApp();
+  }catch(error){ console.error('Streak restore failed:',error); toast(error.message||'Could not restore this streak.'); }
+}
+async function openConversation(target){
+  if(!session?.id || !supabaseClient){ toast('Please log in to send messages.'); return; }
+  const targetUser=DB.users[target];
+  if(!targetUser?.id){ toast('This user profile could not be found.'); return; }
+  const id=conversationIdFor(session.username,target);
+  DB.conversations[id] ||= {id,participants:[session.username,target],updatedAt:Date.now()};
+  DB.messages[id] ||= [];
+  try{
+    const {data:rows,error}=await supabaseClient.from('messages').select('id,conversation_id,sender_id,receiver_id,content,created_at,delivered_at,read_at').eq('conversation_id',id).order('created_at',{ascending:true});
+    if(error) throw error;
+    DB.messages[id]=(rows||[]).map(row=>({id:row.id,senderId:usernameForAuthId(row.sender_id),receiverId:usernameForAuthId(row.receiver_id),content:row.content,createdAt:new Date(row.created_at).getTime(),deliveredAt:row.delivered_at,readAt:row.read_at}));
+    go('thread',{id});
+  }catch(err){ console.error('Could not open conversation:',err); toast('Could not load this conversation.'); }
+}
+async function sendMessage(convoId, text){
+  const content=(text||'').trim();
+  if(!content) return;
+  const conv=DB.conversations[convoId];
+  if(!conv || !session?.id || !supabaseClient) return;
+  const to=conv.participants.find(p=>p!==session.username);
+  const receiver=DB.users[to];
+  if(!receiver?.id){ toast('Recipient account could not be found.'); return; }
+  try{
+    const {data,error}=await supabaseClient.from('messages').insert({
+      conversation_id:convoId,sender_id:session.id,receiver_id:receiver.id,content
+    }).select('id,conversation_id,sender_id,receiver_id,content,created_at,delivered_at,read_at').single();
+    if(error) throw error;
+    (DB.messages[convoId] ||= []).push({id:data.id,senderId:session.username,receiverId:to,content:data.content,createdAt:new Date(data.created_at).getTime(),deliveredAt:data.delivered_at,readAt:data.read_at});
+    conv.updatedAt=new Date(data.created_at).getTime();
+    renderApp();
+    requestAnimationFrame(()=>requestAnimationFrame(scrollChatToBottom));
+  }catch(err){ console.error('NYCTOPHILE send message error:',err); toast(err.message || 'Message could not be sent.'); }
+}
+async function deleteMessage(convoId, messageId){
+  const message=(DB.messages[convoId]||[]).find(m=>String(m.id)===String(messageId));
+  if(!message || message.senderId!==session.username){ toast('You can only delete messages you sent.'); return; }
+  if(!confirm('Unsend this message for everyone in the conversation?')) return;
+  try{
+    const {error}=await supabaseClient.from('messages').delete().eq('id',messageId).eq('sender_id',session.id);
+    if(error) throw error;
+    DB.messages[convoId]=(DB.messages[convoId]||[]).filter(m=>String(m.id)!==String(messageId));
+    const remaining=DB.messages[convoId];
+    if(DB.conversations[convoId]) DB.conversations[convoId].updatedAt=remaining.length?remaining[remaining.length-1].createdAt:0;
+    renderApp();
+    requestAnimationFrame(()=>requestAnimationFrame(scrollChatToBottom));
+    toast('Message unsent for everyone.');
+  }catch(err){ console.error('NYCTOPHILE delete message error:',err); toast(err.message||'Could not delete message.'); }
+}
+async function deleteConversation(id){
+  toast('Conversation history is saved securely and cannot be deleted from this view yet.');
+}
+
+/* ================= REPORTS ================= */
+async function submitReport(type, targetId, reason, details){
+  DB.reports.push({id:uid('r'), type, targetId, reporterId:session.username, reason, details, createdAt:Date.now(), status:'open'});
+  await save('reports');
+  toast('Report submitted. Our team will review it.');
+}
+async function resolveReport(id, action){
+  const r = DB.reports.find(r=>r.id===id); if(!r) return;
+  r.status = action;
+  await save('reports'); renderApp();
+}
+
+/* ================= ADMIN ================= */
+function isAdmin(){ return session && DB.users[session.username]?.role==='admin'; }
+async function toggleSuspend(username){
+  const u = DB.users[username]; if(!u) return;
+  u.suspended = !u.suspended;
+  await save('users'); renderApp();
+}
+async function adminDeleteUser(username){
+  if(!confirm('Permanently delete this user and their content?')) return;
+  delete DB.users[username];
+  Object.values(DB.posts).filter(p=>p.userId===username).forEach(p=>delete DB.posts[p.id]);
+  await save('users'); await save('posts'); renderApp();
+}
+async function adminDeletePost(id, isGroup){
+  if(isGroup) delete DB.groupPosts[id]; else delete DB.posts[id];
+  await save(isGroup?'groupPosts':'posts'); renderApp();
+}
+
+/* ================= RENDER ================= */
+function layout(innerHTML, activeNav){
+  const navItems = [
+    ['home','Home','home'],['explore','Explore','explore'],['groups','Groups','groups'],
+    ['createModal','Create','create'],['messages','Messages','messages'],['notifications','Notifications','bell']
+  ];
+  const nc = unreadCount();
+  const unreadMessages = unreadMessageCount();
+  return `
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">${moonMark(30)}<span class="word">Nyctophile</span></div>
+      ${navItems.map(([v,label,icon])=>`
+        <a class="navlink ${activeNav===v?'active':''}" onclick="${v==='createModal'?'openCreatePost()':`go('${v}')`}">
+          ${ICONS[icon]}<span>${label}</span>
+          ${v==='notifications' && nc>0 ? `<span class="badge">${nc}</span>`:''}
+          ${v==='messages' && unreadMessages>0 ? `<span class="badge" style="background:#e5484d">${unreadMessages>99?'99+':unreadMessages}</span>`:''}
+        </a>`).join('')}
+      <a class="navlink ${activeNav==='profile'?'active':''}" onclick="go('profile',{username:session.username})">${ICONS.user}<span>Profile</span></a>
+      ${isAdmin()?`<a class="navlink ${activeNav==='admin'?'active':''}" onclick="go('admin')">${ICONS.shield}<span>Admin</span></a>`:''}
+      <div class="nav-user" onclick="go('profile',{username:session.username})">
+        ${avatarHTML(session.username,34)}
+        <div style="min-width:0">
+          <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(DB.users[session.username].name)}</div>
+          <div style="font-size:11.5px;color:var(--text-faint)">@${session.username}</div>
+        </div>
+      </div>
+      <a class="navlink" style="margin-top:4px" onclick="handleLogout()">${ICONS.lock}<span>Log out</span></a>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="brand" style="padding:0">${moonMark(24)}<span class="word" style="font-size:18px">Nyctophile</span></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-icon" aria-label="Notifications" title="Notifications" onclick="go('notifications')" style="position:relative;display:grid;place-items:center">${ICONS.bell}${nc>0?`<span class="badge" style="position:absolute;top:-4px;right:-4px">${nc}</span>`:''}</button>
+          <button class="btn-icon" aria-label="Log out" title="Log out" onclick="handleLogout()">${ICONS.lock}</button>
+          <button class="btn-icon" aria-label="Profile" title="Profile" onclick="go('profile',{username:session.username})">${avatarHTML(session.username,34)}</button>
+        </div>
+      </div>
+      ${innerHTML}
+    </div>
+  </div>
+  <div class="bottomnav">
+    ${['home','explore','groups','createModal','messages','profile'].map(v=>{
+      const icon = v==='profile'?'user':v==='createModal'?'create':v;
+      const label = v==='createModal'?'Create':v[0].toUpperCase()+v.slice(1);
+      const act = v==='createModal' ? false : activeNav===v;
+      return `<a class="${act?'active':''}" onclick="${v==='createModal'?'openCreatePost()':v==='profile'?`go('profile',{username:session.username})`:`go('${v}')`}">${ICONS[icon]}<span>${label}</span>${v==='messages'&&unreadMessages>0?`<span class="badge" style="position:absolute;top:0;right:18%;background:#e5484d">${unreadMessages>99?'99+':unreadMessages}</span>`:''}</a>`;
+    }).join('')}
+  </div>`;
+}
+function moonMark(size){
+  return `<svg class="mark" width="${size}" height="${size}" viewBox="0 0 32 32" fill="none">
+    <path d="M20 4a13 13 0 1 0 8 20 10.5 10.5 0 0 1-8-20Z" fill="url(#g1)"/>
+    <circle cx="24" cy="8" r="1.1" fill="#E8C888"/><circle cx="27" cy="13" r="0.7" fill="#E8C888"/>
+    <defs><linearGradient id="g1" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#8D7CFF"/><stop offset="1" stop-color="#5FA8FF"/></linearGradient></defs>
+  </svg>`;
+}
+
+function renderApp(){
+  const app = document.getElementById('app');
+  const focusedId = document.activeElement && document.activeElement.id;
+  const selectionStart = document.activeElement && typeof document.activeElement.selectionStart === 'number' ? document.activeElement.selectionStart : null;
+  const selectionEnd = document.activeElement && typeof document.activeElement.selectionEnd === 'number' ? document.activeElement.selectionEnd : null;
+  if(!session){
+    app.innerHTML = renderPublic();
+  } else {
+    let inner, nav;
+    switch(route.view){
+      case 'home': inner=renderHome(); nav='home'; break;
+      case 'explore': inner=renderExplore(); nav='explore'; break;
+      case 'groups': inner=renderGroupsList(); nav='groups'; break;
+      case 'groupDetail': inner=renderGroupDetail(route.params.id); nav='groups'; break;
+      case 'profile': inner=renderProfile(route.params.username); nav='profile'; break;
+      case 'followList': inner=renderFollowList(route.params.username,route.params.kind); nav='profile'; break;
+      case 'editProfile': inner=renderEditProfile(); nav='profile'; break;
+      case 'notifications': inner=renderNotifications(); nav='notifications'; break;
+      case 'messages': inner=renderMessagesList(); nav='messages'; break;
+      case 'thread': inner=renderThread(route.params.id); nav='messages'; break;
+      case 'admin': inner=renderAdmin(); nav='admin'; break;
+      case 'saved': inner=renderSaved(); nav='profile'; break;
+      default: inner=renderHome(); nav='home';
+    }
+    app.innerHTML = layout(inner, nav);
+  }
+  if(focusedId){
+    const restore = document.getElementById(focusedId);
+    if(restore){
+      restore.focus({preventScroll:true});
+      if(selectionStart !== null && typeof restore.setSelectionRange === 'function') restore.setSelectionRange(selectionStart, selectionEnd);
+    }
+  }
+}
+
+/* ---- Public (landing/auth) ---- */
+function renderPublic(){
+  if(route.view==='login') return renderLogin();
+  if(route.view==='signup') return renderSignup();
+  return renderLanding();
+}
+function renderLanding(){
+  return `
+  <div class="landing">
+    <nav class="landing-nav">
+      <div class="brand">${moonMark(28)}<span class="word">Nyctophile</span></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost btn-sm" onclick="go('login')">Log in</button>
+        <button class="btn btn-primary btn-sm" onclick="go('signup')">Join Nyctophile</button>
+      </div>
+    </nav>
+    <div class="hero">
+      ${moonMark(0)?`<div class="crescent">${moonMark(150).replace('class="mark"','')}</div>`:''}
+      <h1>NYCTOPHILE</h1>
+      <div class="tag">Share. Connect. Express.</div>
+      <p>Discover amazing photography, share your moments, connect with people, and build communities around the things you love — after dark, and beyond it.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="go('signup')">Join Nyctophile</button>
+        <button class="btn btn-ghost" onclick="go('login')">Log in</button>
+      </div>
+    </div>
+    <div class="feature-grid">
+      <div class="card feature"><div class="ic">🌙</div><h3>Discover</h3><p>Explore trending photography and hidden gems from a global community of night owls and storytellers.</p></div>
+      <div class="card feature"><div class="ic">📸</div><h3>Share</h3><p>Post single shots or full carousels, tag them, caption them, and let your work find its audience.</p></div>
+      <div class="card feature"><div class="ic">💬</div><h3>Connect</h3><p>Follow the people whose eye you trust. Comment, message, and build real conversations around real work.</p></div>
+      <div class="card feature"><div class="ic">✨</div><h3>Create communities</h3><p>Start or join groups around a genre, a technique, or a shared obsession — public or invite-only.</p></div>
+    </div>
+    <div class="footer">Nyctophile — a home for people who see best after the sun goes down.</div>
+  </div>`;
+}
+function renderSignup(){
+  return `<div class="authwrap"><div class="card authcard">
+    <h2>Create your account</h2>
+    <div class="sub">Join the community. Takes less than a minute.</div>
+    ${uiState.authError?`<div class="errmsg">${esc(uiState.authError)}</div>`:''}
+    <form onsubmit="handleSignup(event)">
+      <div class="field"><label>Full name</label><input name="name" required></div>
+      <div class="field"><label>Username</label><input name="username" required placeholder="e.g. nightowl"></div>
+      <div class="field"><label>Email</label><input name="email" type="email" required></div>
+      <div class="field"><label>Password</label><input name="password" type="password" required></div>
+      <div class="field"><label>Confirm password</label><input name="confirm" type="password" required></div>
+      <div class="field"><label>Profile picture (optional)</label><input name="avatar" type="file" accept="image/*"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:6px" type="submit">Create account</button>
+    </form>
+    <div class="authfoot">Already have an account? <a onclick="uiState.authError='';go('login')">Log in</a></div>
+  </div></div>`;
+}
+function renderLogin(){
+  return `<div class="authwrap"><div class="card authcard">
+    <h2>Welcome back</h2>
+    <div class="sub">Log in to continue to Nyctophile.</div>
+    ${uiState.authError?`<div class="errmsg">${esc(uiState.authError)}</div>`:''}
+    <form onsubmit="handleLogin(event)">
+      <div class="field"><label>Email address</label><input name="identifier" type="email" required></div>
+      <div class="field"><label>Password</label><input name="password" type="password" required></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;font-size:13px">
+        <label style="display:flex;align-items:center;gap:6px;width:auto;color:var(--text-dim)"><input type="checkbox" style="width:auto" checked> Remember me</label>
+        <a onclick="toast('Password reset isn\\'t wired to email in this demo — try another account or sign up.')" style="color:var(--violet);font-weight:600;cursor:pointer">Forgot password?</a>
+      </div>
+      <button class="btn btn-primary" style="width:100%" type="submit">Log in</button>
+    </form>
+    <div class="authfoot">New here? <a onclick="uiState.authError='';go('signup')">Create an account</a></div>
+  </div></div>`;
+}
+
+/* ---- Home feed ---- */
+function renderHome(){
+  const following = DB.follows[session.username]?.following || [];
+  let posts = Object.values(DB.posts).sort((a,b)=>b.createdAt-a.createdAt);
+  posts.sort((a,b)=>{
+    const af = following.includes(a.userId)?1:0, bf = following.includes(b.userId)?1:0;
+    if(af!==bf) return bf-af;
+    return b.createdAt-a.createdAt;
+  });
+  return `<div class="feedwrap">
+    ${posts.length===0?`
+      <div class="empty"><div class="moon">🌙</div><div style="font-size:16px;color:var(--text)">No posts yet</div><div style="margin-top:6px">Be the first to share something.</div>
+      <button class="btn btn-primary" style="margin-top:18px" onclick="openCreatePost()">Create a post</button></div>
+    `: posts.map(postCardHTML).join('')}
+  </div>`;
+}
+function postCardHTML(post){
+  const u = DB.users[post.userId]; if(!u) return '';
+  const likes = DB.likes[post.id]||[];
+  const liked = likes.includes(session.username);
+  const saved = (DB.saves[session.username]||[]).includes(post.id);
+  const comments = postComments(post.id);
+  const mine = post.userId===session.username;
+  const imgs = post.images||[];
+  return `<div class="card post" data-post="${post.id}">
+    <div class="post-head">
+      <a onclick="go('profile',{username:'${post.userId}'})">${avatarHTML(post.userId,38)}</a>
+      <div class="who">
+        <a class="uname" onclick="go('profile',{username:'${post.userId}'})">${esc(u.name)}</a>
+        <div class="time">${timeAgo(post.createdAt)}${post.category?' · '+CAT_EMOJI[post.category]+' '+post.category:''}</div>
+      </div>
+    </div>
+    <div class="post-media" style="position:relative" ontouchend="handlePostTouch(event, '${post.id}')" ondblclick="doubleTapLike('${post.id}', this)">
+      ${imgs.length>1?`<div class="post-carousel">${imgs.map(im=>`<img src="${im}">`).join('')}</div>`:`<img src="${imgs[0]||''}">`}
+    </div>
+    ${imgs.length>1?`<div class="dots">${imgs.map(()=>'<span></span>').join('')}</div>`:''}
+    <div class="post-actions">
+      <span class="act ${liked?'liked':''}" onclick="toggleLike('${post.id}', this.closest('.post').querySelector('.post-media'))">${liked?ICONS.heartFill:ICONS.heart}<span>${likes.length}</span></span>
+      <span class="act" onclick="toggleComments('${post.id}')">${ICONS.comment}<span>${comments.length}</span></span>
+      <span class="act" onclick="sharePost('${post.id}')">${ICONS.share}</span>
+      <span class="spacer"></span>
+      <span class="act ${saved?'saved':''}" onclick="toggleSave('${post.id}')">${saved?ICONS.bookmarkFill:ICONS.bookmark}</span>
+    </div>
+    <div class="post-body">
+      <div class="cap"><b>${esc(u.name)}</b>${esc(post.caption||'')}</div>
+      ${(post.hashtags&&post.hashtags.length)?`<div class="tags">${post.hashtags.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div>`:''}
+    </div>
+    <div class="post-comments" id="comments-${post.id}" style="display:none">
+      ${comments.slice(0,50).map(c=>commentHTML(c)).join('')}
+      <div class="comment-input">
+        <input placeholder="Add a comment…" onkeydown="if(event.key==='Enter'){addComment('${post.id}',this.value);this.value='';}">
+      </div>
+    </div>
+    ${mine?`<div style="display:flex;justify-content:flex-end;padding:8px 16px 14px;border-top:1px solid var(--line)"><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deletePost('${post.id}',false)">🗑 Delete post</button></div>`:''}
+  </div>`;
+}
+function commentHTML(c){
+  const u = DB.users[c.userId]; if(!u) return '';
+  const liked = c.likes.includes(session.username);
+  return `<div class="comment">
+    ${avatarHTML(c.userId,26)}
+    <div style="flex:1">
+      <div class="txt"><b>${esc(u.name)}</b>${esc(c.content)}</div>
+      <div class="comment-meta">
+        <span>${timeAgo(c.createdAt)}</span>
+        <span style="cursor:pointer;${liked?'color:var(--danger)':''}" onclick="toggleCommentLike('${c.id}')">Like${c.likes.length?' · '+c.likes.length:''}</span>
+        ${c.userId===session.username?`<span style="cursor:pointer" onclick="deleteComment('${c.id}')">Delete</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+function toggleComments(postId){
+  const el = document.getElementById('comments-'+postId);
+  if(el) el.style.display = el.style.display==='none' ? 'block':'none';
+}
+
+/* ---- Explore ---- */
+function renderExplore(){
+  const q = uiState.exploreQuery.toLowerCase();
+  let posts = Object.values(DB.posts);
+  if(uiState.exploreCat!=='All') posts = posts.filter(p=>p.category===uiState.exploreCat);
+  if(q){
+    const users = Object.values(DB.users).filter(u=>u.username.includes(q)||u.name.toLowerCase().includes(q));
+    const groups = Object.values(DB.groups).filter(g=>g.name.toLowerCase().includes(q));
+    posts = posts.filter(p=> (p.caption||'').toLowerCase().includes(q) || (p.hashtags||[]).some(h=>h.toLowerCase().includes(q)));
+    if(users.length || groups.length){
+      return `<div class="pagehead"><div class="section-title">Explore</div></div>
+      ${searchBarHTML()}
+      ${users.length?`<div class="section-title" style="font-size:16px">People</div>${users.map(u=>userRowHTML(u)).join('')}`:''}
+      ${groups.length?`<div class="section-title" style="font-size:16px">Groups</div>${groups.map(g=>groupCardHTML(g)).join('')}`:''}
+      <div class="section-title" style="font-size:16px">Posts</div>
+      ${posts.length? masonryHTML(posts) : `<div class="empty faint">No posts match “${esc(uiState.exploreQuery)}”.</div>`}
+      `;
+    }
+  }
+  posts.sort((a,b)=> ((DB.likes[b.id]||[]).length - (DB.likes[a.id]||[]).length) || (b.createdAt-a.createdAt));
+  return `<div class="pagehead"><div class="section-title">Explore</div></div>
+    ${searchBarHTML()}
+    <div class="chiprow">
+      <span class="chip ${uiState.exploreCat==='All'?'active':''}" onclick="setExploreCat('All')">All</span>
+      ${CATEGORIES.map(c=>`<span class="chip ${uiState.exploreCat===c?'active':''}" onclick="setExploreCat('${c}')">${CAT_EMOJI[c]} ${c}</span>`).join('')}
+    </div>
+    ${posts.length? masonryHTML(posts) : `<div class="empty"><div class="moon">🌌</div>Nothing here yet. Be the first to post in this category.</div>`}
+  `;
+}
+function searchBarHTML(){
+  return `<div class="searchbar">${ICONS.search}<input id="exploreSearchInput" type="search" autocomplete="off" placeholder="Search users, posts, hashtags, groups…" value="${esc(uiState.exploreQuery)}" oninput="uiState.exploreQuery=this.value; renderApp();"></div>`;
+}
+function setExploreCat(c){ uiState.exploreCat=c; renderApp(); }
+function masonryHTML(posts){
+  return `<div class="masonry">${posts.map(p=>`
+    <div class="mitem" onclick="go('home');setTimeout(()=>document.querySelector('[data-post=\\'${p.id}\\']')?.scrollIntoView(),50)">
+      <img src="${(p.images&&p.images[0])||''}">
+    </div>`).join('')}</div>`;
+}
+function userRowHTML(u){
+  return `<div class="card group-card" onclick="go('profile',{username:'${u.username}'})">
+    ${avatarHTML(u.username,48)}
+    <div style="flex:1"><div style="font-weight:600">${esc(u.name)}</div><div class="faint" style="font-size:12.5px">@${u.username}</div></div>
+  </div>`;
+}
+
+/* ---- Groups ---- */
+async function openGroupChat(groupId){
+  uiState.groupTab='chat';
+  uiState.activeGroupChat=groupId;
+  await loadGroupMessages(groupId);
+  if(groupChatChannel){ try{ await supabaseClient.removeChannel(groupChatChannel); }catch(e){} groupChatChannel=null; }
+  groupChatChannel=supabaseClient.channel('group-chat-'+groupId)
+    .on('postgres_changes',{event:'*',schema:'public',table:'group_messages',filter:'group_id=eq.'+groupId},async payload=>{
+      await loadGroupMessages(groupId);
+      if(route.view==='groupDetail' && route.params.id===groupId && uiState.groupTab==='chat') renderApp();
+    }).subscribe();
+  renderApp();
+}
+async function loadGroupMessages(groupId){
+  if(!supabaseClient || !session?.id) return;
+  const {data:rows,error}=await supabaseClient.from('group_messages')
+    .select('id,group_id,user_id,content,created_at').eq('group_id',groupId)
+    .order('created_at',{ascending:true}).limit(300);
+  if(error) throw error;
+  const ids=[...new Set((rows||[]).map(r=>r.user_id))];
+  const known=new Set(Object.values(DB.users).map(u=>u.id).filter(Boolean));
+  const missing=ids.filter(id=>!known.has(id));
+  if(missing.length){
+    const {data:profiles,error:pe}=await supabaseClient.from('profiles').select('id,username,display_name,avatar_url,bio').in('id',missing);
+    if(pe) throw pe;
+    (profiles||[]).forEach(p=>{const u=profileToUser(p);DB.users[u.username]=u;});
+  }
+  const byId={}; Object.values(DB.users).forEach(u=>{if(u.id) byId[u.id]=u.username;});
+  DB.groupMessages=DB.groupMessages||{};
+  DB.groupMessages[groupId]=(rows||[]).map(r=>({id:r.id,userId:byId[r.user_id]||(r.user_id===session.id?session.username:'user_'+String(r.user_id).slice(0,8)),content:r.content,createdAt:new Date(r.created_at).getTime()}));
+}
+async function sendGroupMessage(groupId){
+  const input=document.getElementById('group-chat-input-'+groupId);
+  const content=(input?.value||'').trim();
+  if(!content) return;
+  if(!session?.id){toast('Please log in to chat.');return;}
+  input.disabled=true;
+  try{
+    const {error}=await supabaseClient.from('group_messages').insert({group_id:groupId,user_id:session.id,content});
+    if(error) throw error;
+    input.value='';
+    await loadGroupMessages(groupId);
+    renderApp();
+  }catch(err){console.error('Group chat error:',err);toast('Could not send message: '+(err.message||'Please try again.'));}
+  finally{const el=document.getElementById('group-chat-input-'+groupId);if(el)el.disabled=false;}
+}
+function renderGroupChat(groupId){
+  const messages=(DB.groupMessages||{})[groupId]||[];
+  return `<div class="card" style="padding:14px;margin-bottom:12px">
+    <div id="group-chat-messages-${groupId}" style="max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px">
+      ${messages.length?messages.map(m=>`<div style="display:flex;gap:9px;align-items:flex-start;${m.userId===session.username?'flex-direction:row-reverse':''}">${avatarHTML(m.userId,34)}<div style="max-width:78%;background:${m.userId===session.username?'var(--accent-soft)':'var(--surface-2)'};border:1px solid var(--border);border-radius:13px;padding:9px 12px"><div style="font-size:12px;font-weight:700;margin-bottom:4px">${m.userId===session.username?'You':esc(DB.users[m.userId]?.name||m.userId)}</div><div style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(m.content)}</div><div class="faint" style="font-size:10px;margin-top:5px">${new Date(m.createdAt).toLocaleString()}</div></div></div>`).join(''):`<div class="empty faint">No messages yet. Start the conversation!</div>`}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px"><input id="group-chat-input-${groupId}" class="input" style="flex:1" placeholder="Write a message…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGroupMessage('${groupId}')}"><button class="btn btn-primary" onclick="sendGroupMessage('${groupId}')">Send</button></div>
+  </div>`;
+}
+
+function renderGroupsList(){
+  const groups = Object.values(DB.groups).sort((a,b)=>b.createdAt-a.createdAt);
+  const mine = groups.filter(g=>isMember(g,session.username));
+  const others = groups.filter(g=>!isMember(g,session.username));
+  return `<div class="pagehead" style="display:flex;align-items:center;justify-content:space-between">
+    <div class="section-title" style="margin:0">Groups</div>
+    <button class="btn btn-primary btn-sm" onclick="openCreateGroup()">+ New group</button>
+  </div>
+  ${mine.length?`<div style="margin:14px 0 6px;font-weight:600;color:var(--text-dim);font-size:13px">Your groups</div>${mine.map(groupCardHTML).join('')}`:''}
+  <div style="margin:18px 0 6px;font-weight:600;color:var(--text-dim);font-size:13px">Discover groups</div>
+  ${others.length?others.map(groupCardHTML).join(''):`<div class="empty faint">No other groups yet — start one!</div>`}
+  `;
+}
+function groupCardHTML(g){
+  const member = isMember(g,session.username);
+  return `<div class="card group-card">
+    <div style="cursor:pointer;display:flex;gap:14px;align-items:center;flex:1" onclick="go('groupDetail',{id:'${g.id}'})">
+      ${g.image?`<img class="group-cover" src="${g.image}">`:`<div class="group-cover"></div>`}
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600">${esc(g.name)}</span><span class="priv-badge">${g.privacy==='private'?'🔒 Private':'🌐 Public'}</span></div>
+        <div class="faint" style="font-size:12.5px;margin-top:2px">${g.members.length} member${g.members.length!==1?'s':''} · ${CAT_EMOJI[g.category]||''} ${g.category||''}</div>
+      </div>
+    </div>
+    ${member?`<span class="faint" style="font-size:12px">Joined</span>`:`<button class="btn btn-ghost btn-sm" onclick="joinGroup('${g.id}')">${g.privacy==='private'?'Request':'Join'}</button>`}
+  </div>`;
+}
+function renderGroupDetail(id){
+  const g = DB.groups[id];
+  if(!g) return `<div class="empty">Group not found.</div>`;
+  const member = isMember(g,session.username);
+  const role = memberRole(g,session.username);
+  const isOwnerOrMod = role==='admin'||role==='moderator';
+  const posts = Object.values(DB.groupPosts).filter(p=>p.groupId===id).sort((a,b)=>b.createdAt-a.createdAt);
+  const tab = uiState.groupTab;
+  return `<div class="pagehead">
+    <div class="card" style="padding:20px;display:flex;gap:16px;align-items:center;margin-top:10px">
+      ${g.image?`<img class="group-cover" style="width:72px;height:72px" src="${g.image}">`:`<div class="group-cover" style="width:72px;height:72px"></div>`}
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="section-title" style="margin:0">${esc(g.name)}</span><span class="priv-badge">${g.privacy==='private'?'🔒 Private':'🌐 Public'}</span></div>
+        <div class="faint" style="font-size:13px;margin:6px 0">${esc(g.description||'')}</div>
+        <div class="faint" style="font-size:12.5px">${g.members.length} members · ${CAT_EMOJI[g.category]||''} ${g.category||''}</div>
+      </div>
+      <div>
+        ${member? (role==='admin'? '' : `<button class="btn btn-ghost btn-sm" onclick="leaveGroup('${id}')">Leave</button>`)
+          : `<button class="btn btn-primary btn-sm" onclick="joinGroup('${id}')">${g.privacy==='private'?'Request to join':'Join group'}</button>`}
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tabbtn ${tab==='feed'?'active':''}" onclick="uiState.groupTab='feed';renderApp()">POSTS</div>
+    <div class="tabbtn ${tab==='chat'?'active':''}" onclick="openGroupChat('${id}')">CHAT 💬</div>
+    <div class="tabbtn ${tab==='members'?'active':''}" onclick="uiState.groupTab='members';renderApp()">MEMBERS (${g.members.length})</div>
+    ${isOwnerOrMod?`<div class="tabbtn ${tab==='requests'?'active':''}" onclick="uiState.groupTab='requests';renderApp()">REQUESTS (${g.pendingRequests.length})</div>`:''}
+  </div>
+  <div style="padding-top:16px">
+  ${tab==='feed'?`
+    ${member?`<button class="btn btn-primary btn-sm" style="margin-bottom:14px" onclick="openCreatePost('${id}')">+ Post in ${esc(g.name)}</button>`:''}
+    <div class="feedwrap" style="padding:0;max-width:100%">
+    ${posts.length? posts.map(p=>groupPostCardHTML(p,g)).join('') : `<div class="empty faint">No posts yet in this group.</div>`}
+    </div>
+  `:''}
+  ${tab==='chat'?`${member?renderGroupChat(id):`<div class="empty faint">Join this group to participate in its chat.</div>`}`:''}
+  ${tab==='members'?`
+    ${role==='admin'?`<div class="card" style="display:flex;gap:8px;padding:12px;margin-bottom:12px;flex-wrap:wrap"><input id="add-group-member-${id}" class="input" style="flex:1;min-width:180px" placeholder="Enter username to add (e.g. @alex)" onkeydown="if(event.key==='Enter')addGroupMember('${id}')"><button class="btn btn-primary btn-sm" onclick="addGroupMember('${id}')">+ Add member</button></div>`:''}
+    ${g.members.map(m=>`<div class="card group-card">
+      <a onclick="go('profile',{username:'${m.username}'})" style="display:flex;gap:12px;align-items:center;flex:1;cursor:pointer">
+        ${avatarHTML(m.username,42)}<div><div style="font-weight:600">${esc(DB.users[m.username]?.name||m.username)}</div><div class="faint" style="font-size:12px">${m.role}</div></div>
+      </a>
+      ${isOwnerOrMod && m.username!==g.ownerId && m.username!==session.username ? `
+        <div style="display:flex;gap:6px">
+          ${role==='admin' && m.role!=='moderator'?`<button class="btn btn-ghost btn-sm" onclick="setModerator('${id}','${m.username}','moderator')">Make mod</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="removeMember('${id}','${m.username}',true)">Ban</button>
+        </div>`:''}
+    </div>`).join('')}
+  `:''}
+  ${tab==='requests'?`
+    ${g.pendingRequests.length? g.pendingRequests.map(u=>`<div class="card group-card">
+      <div style="display:flex;gap:12px;align-items:center;flex:1">${avatarHTML(u,40)}<div style="font-weight:600">${esc(DB.users[u]?.name||u)}</div></div>
+      <div style="display:flex;gap:6px"><button class="btn btn-primary btn-sm" onclick="approveRequest('${id}','${u}',true)">Approve</button><button class="btn btn-ghost btn-sm" onclick="approveRequest('${id}','${u}',false)">Decline</button></div>
+    </div>`).join('') : `<div class="empty faint">No pending requests.</div>`}
+  `:''}
+  </div>`;
+}
+function groupPostCardHTML(post, g){
+  const u = DB.users[post.userId]; if(!u) return '';
+  const likes = DB.likes[post.id]||[];
+  const liked = likes.includes(session.username);
+  const comments = postComments(post.id);
+  const canModerate = memberRole(g,session.username)==='admin'||memberRole(g,session.username)==='moderator';
+  return `<div class="card post" data-post="${post.id}">
+    <div class="post-head">
+      <a onclick="go('profile',{username:'${post.userId}'})">${avatarHTML(post.userId,38)}</a>
+      <div class="who"><a class="uname" onclick="go('profile',{username:'${post.userId}'})">${esc(u.name)}</a><div class="time">${timeAgo(post.createdAt)}</div></div>
+    </div>
+    ${post.images&&post.images.length?`<div class="post-media" ontouchend="handlePostTouch(event, '${post.id}')" ondblclick="doubleTapLike('${post.id}', this)"><img src="${post.images[0]}"></div>`:''}
+    <div class="post-actions">
+      <span class="act ${liked?'liked':''}" onclick="toggleLike('${post.id}', this.closest('.post').querySelector('.post-media')||this)">${liked?ICONS.heartFill:ICONS.heart}<span>${likes.length}</span></span>
+      <span class="act" onclick="toggleComments('${post.id}')">${ICONS.comment}<span>${comments.length}</span></span>
+      <span class="act" onclick="sharePost('${post.id}')">${ICONS.share}</span>
+    </div>
+    <div class="post-body"><div class="cap"><b>${esc(u.name)}</b>${esc(post.caption||'')}</div></div>
+    <div class="post-comments" id="comments-${post.id}" style="display:none">
+      ${comments.map(c=>commentHTML(c)).join('')}
+      <div class="comment-input"><input placeholder="Add a comment…" onkeydown="if(event.key==='Enter'){addComment('${post.id}',this.value);this.value='';}"></div>
+    </div>
+    ${(post.userId===session.username||canModerate)?`<div style="display:flex;justify-content:flex-end;padding:8px 16px 14px;border-top:1px solid var(--line)"><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deletePost('${post.id}',true)">🗑 Delete post</button></div>`:''}
+  </div>`;
+}
+
+/* ---- Profile ---- */
+function renderProfile(username){
+  const u = DB.users[username];
+  if(!u) return `<div class="empty">User not found.</div>`;
+  const mine = username===session.username;
+  const posts = Object.values(DB.posts).filter(p=>p.userId===username).sort((a,b)=>b.createdAt-a.createdAt);
+  const followers = DB.follows[username]?.followers || [];
+  const following = DB.follows[username]?.following || [];
+  const tab = uiState.profileTab;
+  return `<div class="pagehead">
+    <div class="profile-head">
+      ${avatarHTML(username,92)}
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-size:19px;font-weight:700">${esc(u.name)}</span>
+          ${u.role==='admin'?'<span class="priv-badge">Admin</span>':''}
+          ${u.suspended?'<span class="priv-badge" style="color:var(--danger)">Suspended</span>':''}
+        </div>
+        <div class="faint" style="font-size:13.5px">@${username} · joined ${new Date(u.createdAt).toLocaleDateString(undefined,{month:'long',year:'numeric'})}</div>
+        ${u.bio?`<div style="margin-top:10px;font-size:14px;line-height:1.5">${esc(u.bio)}</div>`:''}
+        <div class="profile-stats">
+          <div><span class="n">${posts.length}</span> <span class="l">posts</span></div>
+          <div role="button" tabindex="0" style="cursor:pointer" onclick="openFollowList('${username}','followers')"><span class="n">${followers.length}</span> <span class="l">followers</span></div>
+          <div role="button" tabindex="0" style="cursor:pointer" onclick="openFollowList('${username}','following')"><span class="n">${following.length}</span> <span class="l">following</span></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          ${mine?`<button class="btn btn-ghost btn-sm" onclick="go('editProfile')">Edit profile</button><button class="btn btn-ghost btn-sm" onclick="go('saved')">Saved</button>`:
+          `${followButton(username)}
+          <button class="btn btn-ghost btn-sm" onclick="openConversation('${username}')">Message</button>
+          `}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tabbtn ${tab==='posts'?'active':''}" onclick="uiState.profileTab='posts';renderApp()">POSTS</div>
+  </div>
+  <div style="padding-top:14px">
+  ${posts.length? `<div class="grid3">${posts.map(p=>`<div class="cell" role="button" tabindex="0" aria-label="Preview post" onclick="openProfilePost('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProfilePost('${p.id}');}"><img src="${(p.images&&p.images[0])||''}"></div>`).join('')}</div>`
+    : `<div class="empty"><div class="moon">🌙</div>${mine?'No posts yet — share your first moment.':'No posts yet.'}</div>`}
+  </div>`;
+}
+
+function openProfilePost(postId){
+  const post = DB.posts[postId];
+  if(!post){ toast('This post is no longer available.'); return; }
+  openModal(`<div style="max-width:100%"><h3 style="margin:0 38px 16px 0">Post preview</h3>${postCardHTML(post)}</div>`);
+}
+
+function renderEditProfile(){
+  const u = DB.users[session.username];
+  return `<div class="authwrap" style="min-height:auto;padding:30px 0"><div class="card authcard" style="max-width:460px">
+    <h2>Edit profile</h2>
+    <form onsubmit="handleEditProfile(event)">
+      <div class="field"><label>Profile picture</label>
+        <div style="display:flex;align-items:center;gap:14px">${avatarHTML(session.username,60)}<input name="avatar" type="file" accept="image/*"></div>
+      </div>
+      <div class="field"><label>Full name</label><input name="name" value="${esc(u.name)}" required></div>
+      <div class="field"><label>Username</label><input name="username" value="${esc(u.username)}" required></div>
+      <div class="field"><label>Bio</label><textarea name="bio" rows="3">${esc(u.bio||'')}</textarea></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:6px" type="submit">Save changes</button>
+    </form>
+  </div></div>`;
+}
+async function handleEditProfile(e){
+  e.preventDefault();
+  const form=e.currentTarget;
+  const button=form.querySelector('button[type="submit"]');
+  const currentUser=DB.users[session?.username];
+  if(!session?.id || !supabaseClient || !currentUser){ toast('Please log in again before editing your profile.'); return; }
+  const newName=form.elements['name'].value.trim();
+  const newUsername=form.elements['username'].value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'');
+  const bio=form.elements['bio'].value.trim();
+  const file=form.elements['avatar'].files[0];
+  if(!newName || newUsername.length<3){ toast('Enter a name and a username with at least 3 characters.'); return; }
+  if(button){button.disabled=true;button.textContent='Saving…';}
+  try{
+    if(newUsername!==session.username){
+      const {data:existing,error:checkError}=await supabaseClient.from('profiles')
+        .select('id').eq('username',newUsername).neq('id',session.id).maybeSingle();
+      if(checkError) throw checkError;
+      if(existing) throw new Error('That username is already taken.');
+    }
+
+    let avatarUrl=currentUser.avatar || null;
+    if(file){
+      if(!file.type.startsWith('image/')) throw new Error('Please choose an image file.');
+      const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
+      const path=`${session.id}/avatar-${Date.now()}.${ext}`;
+      const {error:uploadError}=await supabaseClient.storage.from('post-images')
+        .upload(path,file,{contentType:file.type,upsert:false});
+      if(uploadError) throw uploadError;
+      const {data:publicData}=supabaseClient.storage.from('post-images').getPublicUrl(path);
+      avatarUrl=publicData.publicUrl;
+    }
+
+    const {data:updated,error:updateError}=await supabaseClient.from('profiles')
+      .update({username:newUsername,display_name:newName,bio,avatar_url:avatarUrl})
+      .eq('id',session.id)
+      .select('id,username,display_name,bio,avatar_url,created_at').single();
+    if(updateError) throw updateError;
+
+    const oldUsername=session.username;
+    const updatedUser=profileToUser(updated,currentUser.email||'');
+    if(oldUsername!==newUsername){
+      delete DB.users[oldUsername];
+      session.username=newUsername;
+    }
+    DB.users[newUsername]=updatedUser;
+    await loadSupabasePosts();
+    toast('Profile saved successfully!');
+    go('profile',{username:session.username});
+  }catch(err){
+    console.error('NYCTOPHILE profile update error:',err);
+    toast('Could not save profile: '+(err.message||'Please try again.'));
+  }finally{
+    if(button){button.disabled=false;button.textContent='Save changes';}
+  }
+}
+function renderSaved(){
+  const ids = DB.saves[session.username]||[];
+  const posts = ids.map(id=>DB.posts[id]).filter(Boolean).sort((a,b)=>b.createdAt-a.createdAt);
+  return `<div class="pagehead"><div class="section-title">Saved</div></div>
+  <div class="feedwrap" style="padding-top:0">
+  ${posts.length? posts.map(postCardHTML).join('') : `<div class="empty"><div class="moon">🔖</div>Nothing saved yet.</div>`}
+  </div>`;
+}
+
+/* ---- Notifications ---- */
+async function openNotificationPost(postId){
+  if(!postId){ toast('This notification has no linked post.'); return; }
+  let post=DB.posts[postId] || DB.groupPosts[postId];
+  if(!post && supabaseClient){
+    try{
+      const {data:row,error}=await supabaseClient.from('posts')
+        .select('id,user_id,caption,image_url,image_urls,hashtags,category,created_at')
+        .eq('id',postId).maybeSingle();
+      if(error) throw error;
+      if(row){
+        const {data:profile,error:profileError}=await supabaseClient.from('profiles')
+          .select('id,username,display_name,avatar_url,bio').eq('id',row.user_id).maybeSingle();
+        if(profileError) throw profileError;
+        if(profile){ const user=profileToUser(profile); DB.users[user.username]=user; }
+        const username=profile?.username || ('user_'+String(row.user_id).slice(0,8));
+        const images=Array.isArray(row.image_urls)&&row.image_urls.length ? row.image_urls : (row.image_url?[row.image_url]:[]);
+        post=DB.posts[postId]={id:row.id,userId:username,images,caption:row.caption||'',hashtags:row.hashtags||[],category:row.category||'Other',createdAt:new Date(row.created_at).getTime(),groupId:null};
+      }
+    }catch(error){ console.error('Could not open notification post:',error); toast('Could not load that post. Please try again.'); return; }
+  }
+  if(!post){ toast('This post may have been deleted.'); return; }
+  go('home');
+  setTimeout(()=>{
+    const card=[...document.querySelectorAll('[data-post]')].find(el=>el.getAttribute('data-post')===String(postId));
+    if(card){
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+      card.style.outline='2px solid var(--violet)';
+      card.style.boxShadow='0 0 0 5px rgba(141,124,255,.16)';
+      setTimeout(()=>{card.style.outline='';card.style.boxShadow='';},2400);
+    }else{ toast('Post loaded, but it is not currently visible in your feed.'); }
+  },80);
+}
+function openNotificationItem(type, fromUser, referenceId){
+  if(type==='friend_request'){
+    if(fromUser && DB.users[fromUser]) go('profile',{username:fromUser});
+    else toast('Could not find this user profile.');
+    return;
+  }
+  openNotificationPost(referenceId);
+}
+async function respondToFriendRequestNotification(friendshipId, accept){
+  if(!supabaseClient || !session?.id || !friendshipId) return;
+  try{
+    let result;
+    if(accept){
+      result=await supabaseClient.from('friendships').update({status:'accepted',updated_at:new Date().toISOString()})
+        .eq('id',friendshipId).eq('addressee_id',session.id).eq('status','pending');
+    }else{
+      result=await supabaseClient.from('friendships').delete()
+        .eq('id',friendshipId).eq('addressee_id',session.id).eq('status','pending');
+    }
+    if(result.error) throw result.error;
+    await loadSupabasePosts();
+    await loadSupabaseNotifications();
+    renderApp();
+    toast(accept?'Friend request accepted!':'Friend request declined.');
+  }catch(error){console.error(error);toast(error.message||'Could not respond to friend request.');}
+}
+function notificationFriendRequestActions(n){
+  if(n.type!=='friend_request' || !n.referenceId) return '';
+  const target=esc(String(n.referenceId));
+  return `<div class="notif-actions" style="display:flex;gap:7px;margin-top:8px">
+    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();respondToFriendRequestNotification('${target}',true)">Accept</button>
+    <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();respondToFriendRequestNotification('${target}',false)">Decline</button>
+  </div>`;
+}
+function renderNotifications(){
+  const list = DB.notifications[session.username]||[];
+  const unread=list.filter(n=>!n.read);
+  unread.forEach(n=>n.read=true);
+  if(unread.length && supabaseClient && session?.id){
+    supabaseClient.from('notifications').update({is_read:true}).eq('user_id',session.id).eq('is_read',false)
+      .then(({error})=>{if(error) console.error('Could not mark notifications read:',error);});
+  }else if(unread.length){ save('notifications'); }
+  const msg = {like:'liked your post', comment:'commented on your post', follow:'started following you',
+    friend_request:'sent you a friend request', group_request:'requested to join your group', group_approved:'approved your group request'};
+  return `<div class="pagehead"><div class="section-title">Notifications</div></div>
+  <div class="card" style="padding:4px 14px">
+  ${list.length? list.map(n=>`
+    <div class="notif ${n.read?'':'unread'}" ${(n.type==='friend_request' || n.referenceId)?`role="button" tabindex="0" onclick="openNotificationItem('${esc(String(n.type))}','${esc(String(n.fromUser||''))}','${esc(String(n.referenceId||''))}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNotificationItem('${esc(String(n.type))}','${esc(String(n.fromUser||''))}','${esc(String(n.referenceId||''))}')}" style="cursor:pointer"`:''}>
+      ${avatarHTML(n.fromUser,36)}
+      <div style="flex:1;font-size:13.5px"><b>${esc(DB.users[n.fromUser]?.name||n.fromUser)}</b> ${msg[n.type]||n.type}<div class="faint" style="font-size:11.5px;margin-top:2px">${timeAgo(n.createdAt)}${n.type==='friend_request'?'':(n.referenceId? ' · View post':'')}</div></div>
+    </div>`).join('') : `<div class="empty"><div class="moon">🔔</div>No notifications yet.</div>`}
+  </div>`;
+}
+
+/* ---- Messages ---- */
+function renderMessageContent(content, compact=false){
+  const match=String(content||'').match(/^\[\[NYCTOPHILE_POST:(.+)\]\]$/);
+  if(match){
+    if(compact) return '📷 Shared a post';
+    const postId=match[1];
+    const post=DB.posts?.[postId] || DB.groupPosts?.[postId];
+    const image=post?.images?.[0] || '';
+    const caption=post?.caption || '';
+    return `<div class="shared-post-preview" style="width:min(260px,100%);overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)">
+      ${image?`<img src="${esc(image)}" alt="Shared post photo" loading="lazy" onclick="openNotificationPost('${esc(postId)}')" style="display:block;width:100%;max-height:240px;object-fit:cover;cursor:pointer">`:`<div style="padding:18px;text-align:center;font-size:28px">📎</div>`}
+      <div style="padding:9px 10px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px">Shared a post</div>
+        ${caption?`<div style="font-size:12px;line-height:1.4;overflow-wrap:anywhere;margin-bottom:8px">${esc(caption.slice(0,120))}${caption.length>120?'…':''}</div>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openNotificationPost('${esc(postId)}')">View post ↗</button>
+      </div>
+    </div>`;
+  }
+  return esc(content);
+}
+function renderMessagesList(){
+  const convos = Object.values(DB.conversations).filter(c=>c.participants.includes(session.username)).sort((a,b)=>b.updatedAt-a.updatedAt);
+  return `<div class="pagehead"><div class="section-title">Messages</div></div>
+  <div class="card" style="padding:4px 14px">
+  ${convos.length? convos.map(c=>{
+    const other = c.participants.find(p=>p!==session.username);
+    const msgs = DB.messages[c.id]||[];
+    const last = msgs[msgs.length-1];
+    return `<div class="convo" style="cursor:pointer" onclick="go('thread',{id:'${c.id}'})">
+      <span role="button" tabindex="0" title="View profile" onclick="event.stopPropagation();go('profile',{username:'${esc(other)}'})" onkeydown="if(event.key==='Enter'){event.stopPropagation();go('profile',{username:'${esc(other)}'})}">${avatarHTML(other,42)}</span>
+      <div style="flex:1;min-width:0"><div role="button" tabindex="0" style="font-weight:600;font-size:14px;cursor:pointer" onclick="event.stopPropagation();go('profile',{username:'${esc(other)}'})" onkeydown="if(event.key==='Enter'){event.stopPropagation();go('profile',{username:'${esc(other)}'})}"><span class="presence-dot ${isUserOnline(other)?'online':''}"></span>${esc(DB.users[other]?.name||other)}</div>
+      <div class="faint" style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${last?renderMessageContent(last.content,true):'Start the conversation'}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><span class="faint" style="font-size:11px">${last?timeAgo(last.createdAt):''}</span>${chatStreakBadge(c.id)}</div>
+    </div>`;
+  }).join('') : `<div class="empty"><div class="moon">💬</div>No conversations yet.</div>`}
+  </div>`;
+}
+function renderThread(id){
+  const conv = DB.conversations[id];
+  if(!conv) return `<div class="empty">Conversation not found.</div>`;
+  const other = conv.participants.find(p=>p!==session.username);
+  const msgs = DB.messages[id]||[];
+  return `<div class="pagehead" style="display:flex;align-items:center;gap:12px">
+    <button class="btn-icon" onclick="go('messages')">←</button>
+    <span role="button" tabindex="0" title="View profile" style="cursor:pointer" onclick="go('profile',{username:'${esc(other)}'})" onkeydown="if(event.key==='Enter')go('profile',{username:'${esc(other)}'})">${avatarHTML(other,36)}</span><div role="button" tabindex="0" style="font-weight:600;flex:1;cursor:pointer" onclick="go('profile',{username:'${esc(other)}'})" onkeydown="if(event.key==='Enter')go('profile',{username:'${esc(other)}'})"><span class="presence-dot ${isUserOnline(other)?'online':''}"></span>${esc(DB.users[other]?.name||other)}<div class="faint" style="font-size:11px;font-weight:400">${isUserOnline(other)?'Online':'Offline'} ${chatStreakBadge(id)}</div></div>
+  </div>
+  ${streakRestorePanel(id)}
+  <div class="card" style="padding:14px">
+    <div class="msg-thread">
+      ${msgs.length? msgs.map(m=>`<div class="message-row" style="display:flex;flex-direction:column;align-items:${m.senderId===session.username?'flex-end':'flex-start'};margin:6px 0"><div style="display:flex;align-items:center;gap:6px;max-width:100%;${m.senderId===session.username?'flex-direction:row-reverse;':''}"><div class="bubble ${m.senderId===session.username?'me':'them'}">${renderMessageContent(m.content)}</div>${m.senderId===session.username?`<button class="btn-icon" title="Delete message" aria-label="Delete message" style="width:28px;height:28px;font-size:14px;opacity:.75" onclick="deleteMessage('${id}','${m.id}')">⋯</button>`:''}</div>${m.senderId===session.username?`<div class="faint" style="font-size:10px;margin:2px 6px">${m.readAt?'✓✓ Seen':m.deliveredAt?'✓✓ Delivered':'✓ Sent'}</div>`:''}</div>`).join('') : `<div class="empty faint" style="padding:30px">Say hello 👋</div>`}
+    </div>
+    <div id="typingLabel" class="typing-label">${someoneTyping?'Typing…':''}</div>
+    <div class="comment-input" style="margin-top:6px">
+      <input id="threadInput" placeholder="Message…" oninput="sendTypingState(this.value.trim().length>0)" onkeydown="if(event.key==='Enter'){sendTypingState(false);sendMessage('${id}',this.value);this.value='';}">
+      <button class="btn btn-primary btn-sm" onclick="const i=document.getElementById('threadInput'); sendMessage('${id}',i.value); i.value='';">Send</button>
+    </div>
+  </div>`;
+}
+
+/* ---- Admin ---- */
+function renderAdmin(){
+  if(!isAdmin()) return `<div class="empty">You don't have access to this page.</div>`;
+  const users = Object.values(DB.users);
+  const posts = Object.values(DB.posts).length + Object.values(DB.groupPosts).length;
+  const comments = Object.values(DB.comments).length;
+  const likes = Object.values(DB.likes).reduce((s,a)=>s+a.length,0);
+  const groups = Object.values(DB.groups).length;
+  const openReports = DB.reports.filter(r=>r.status==='open');
+  return `<div class="pagehead"><div class="section-title">Admin dashboard</div></div>
+  <div class="stat-grid">
+    <div class="card stat"><div class="num">${users.length}</div><div class="lbl">Total users</div></div>
+    <div class="card stat"><div class="num">${posts}</div><div class="lbl">Total posts</div></div>
+    <div class="card stat"><div class="num">${groups}</div><div class="lbl">Total groups</div></div>
+    <div class="card stat"><div class="num">${comments}</div><div class="lbl">Total comments</div></div>
+    <div class="card stat"><div class="num">${likes}</div><div class="lbl">Total likes</div></div>
+    <div class="card stat"><div class="num">${openReports.length}</div><div class="lbl">Open reports</div></div>
+  </div>
+  <div class="section-title" style="font-size:17px">Users</div>
+  <div class="card" style="padding:10px;overflow-x:auto">
+  <table><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody>
+  ${users.map(u=>`<tr>
+    <td style="display:flex;align-items:center;gap:8px">${avatarHTML(u.username,26)}${esc(u.name)} <span class="faint">@${u.username}</span></td>
+    <td class="faint">${esc(u.email)}</td><td>${u.role}</td>
+    <td>${u.suspended?'<span style="color:var(--danger)">Suspended</span>':'Active'}</td>
+    <td style="text-align:right;white-space:nowrap">
+      <button class="btn btn-ghost btn-sm" onclick="toggleSuspend('${u.username}')">${u.suspended?'Unsuspend':'Suspend'}</button>
+      ${u.role!=='admin'?`<button class="btn btn-danger btn-sm" onclick="adminDeleteUser('${u.username}')">Delete</button>`:''}
+    </td>
+  </tr>`).join('')}
+  </tbody></table></div>
+
+  <div class="section-title" style="font-size:17px">Reports</div>
+  <div class="card" style="padding:10px;overflow-x:auto">
+  <table><thead><tr><th>Type</th><th>Target</th><th>Reason</th><th>Reporter</th><th>Status</th><th></th></tr></thead><tbody>
+  ${DB.reports.length? DB.reports.slice().reverse().map(r=>`<tr>
+    <td>${r.type}</td><td class="faint">${esc(r.targetId)}</td><td>${esc(r.reason)}</td><td>@${r.reporterId}</td>
+    <td>${r.status}</td>
+    <td style="white-space:nowrap">
+    ${r.status==='open'?`<button class="btn btn-ghost btn-sm" onclick="resolveReport('${r.id}','dismissed')">Dismiss</button>
+    ${r.type==='post'?`<button class="btn btn-danger btn-sm" onclick="adminDeletePost('${r.targetId}',false); resolveReport('${r.id}','removed')">Remove</button>`:''}`:''}
+    </td>
+  </tr>`).join('') : `<tr><td colspan="6" class="faint" style="text-align:center;padding:20px">No reports.</td></tr>`}
+  </tbody></table></div>`;
+}
+
+/* ================= MODALS ================= */
+let modalRoot;
+function closeModal(){ if(modalRoot) modalRoot.remove(); modalRoot=null; }
+function openModal(html){
+  closeModal();
+  modalRoot = document.createElement('div');
+  modalRoot.className='modal-bg';
+  modalRoot.onclick = (e)=>{ if(e.target===modalRoot) closeModal(); };
+  modalRoot.innerHTML = `<div class="card modal" onclick="event.stopPropagation()"><button class="btn-icon modal-close" onclick="closeModal()">✕</button>${html}</div>`;
+  document.body.appendChild(modalRoot);
+}
+
+let createPostImages = [];
+function openCreatePost(groupId){
+  createPostImages = [];
+  openModal(`
+    <h3>Create post${groupId?' · '+esc(DB.groups[groupId].name):''}</h3>
+    <input type="hidden" id="cp-group" value="${groupId||''}">
+    <div class="drop" onclick="document.getElementById('cp-file').click()">
+      📷 Click to upload photos, or drag & drop<br><span class="faint">JPG, PNG, WEBP, GIF — up to 15MB each</span>
+    </div>
+    <input id="cp-file" type="file" accept="image/*" multiple style="display:none" onchange="handleCPFiles(event)">
+    <div class="preview-grid" id="cp-preview"></div>
+    <div class="field"><label>Caption</label><textarea id="cp-caption" rows="3" placeholder="Write a caption…"></textarea></div>
+    <div class="field"><label>Hashtags (comma separated)</label><input id="cp-tags" placeholder="night, longexposure, city"></div>
+    <div class="field"><label>Category</label><select id="cp-cat">${CATEGORIES.map(c=>`<option value="${c}">${CAT_EMOJI[c]} ${c}</option>`).join('')}</select></div>
+    <button class="btn btn-primary" style="width:100%" onclick="submitCreatePost()">Publish</button>
+  `);
+}
+async function handleCPFiles(e){
+  const files = Array.from(e.target.files).slice(0, 10-createPostImages.length);
+  for(const f of files){
+    try{ const dataUrl = await readAndResize(f); createPostImages.push(dataUrl); }
+    catch(err){ toast(typeof err==='string'?err:'Could not process image'); }
+  }
+  renderCPPreview();
+}
+function renderCPPreview(){
+  document.getElementById('cp-preview').innerHTML = createPostImages.map((im,i)=>`
+    <div class="pv"><img src="${im}"><div class="rm" onclick="createPostImages.splice(${i},1);renderCPPreview()">✕</div></div>`).join('');
+}
+async function submitCreatePost(){
+  if(createPostImages.length===0 && !document.getElementById('cp-caption')?.value.trim()){ toast('Write something or add a photo'); return; }
+  const groupId = document.getElementById('cp-group').value || null;
+  const caption = document.getElementById('cp-caption').value;
+  const hashtags = document.getElementById('cp-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const category = document.getElementById('cp-cat').value;
+  const submitButton=document.querySelector('#modal button.btn-primary');
+  if(submitButton){submitButton.disabled=true;submitButton.textContent='Publishing…';}
+  try{
+    await createPost({images:createPostImages, caption, hashtags, category, groupId});
+    createPostImages=[];
+    closeModal();
+    if(groupId){uiState.groupTab='feed';go('groupDetail',{id:groupId});}else go('home');
+  }catch(err){
+    console.error('NYCTOPHILE publish error:',err);
+    toast(err.message||'Could not publish post.');
+    if(submitButton){submitButton.disabled=false;submitButton.textContent='Publish';}
+  }
+}
+
+let createGroupImage = null;
+function openCreateGroup(){
+  createGroupImage = null;
+  openModal(`
+    <h3>Create a group</h3>
+    <div class="field"><label>Cover image</label>
+      <div class="drop" onclick="document.getElementById('cg-file').click()" id="cg-drop">🖼 Click to upload a cover image</div>
+      <input id="cg-file" type="file" accept="image/*" style="display:none" onchange="handleCGFile(event)">
+    </div>
+    <div class="field"><label>Group name</label><input id="cg-name" placeholder="Night Photography"></div>
+    <div class="field"><label>Description</label><textarea id="cg-desc" rows="2" placeholder="Share your best night photography and discuss techniques."></textarea></div>
+    <div class="field"><label>Category</label><select id="cg-cat">${CATEGORIES.map(c=>`<option value="${c}">${CAT_EMOJI[c]} ${c}</option>`).join('')}</select></div>
+    <div class="field"><label>Privacy</label><select id="cg-priv"><option value="public">🌐 Public — anyone can find and join</option><option value="private">🔒 Private — request to join</option></select></div>
+    <button class="btn btn-primary" style="width:100%" onclick="submitCreateGroup()">Create group</button>
+  `);
+}
+async function handleCGFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  try{ createGroupImage = await readAndResize(f, 500, .75); document.getElementById('cg-drop').innerHTML = `<img src="${createGroupImage}" style="max-height:100px;border-radius:8px">`; }
+  catch(err){ toast('Could not process image'); }
+}
+async function submitCreateGroup(){
+  const name = document.getElementById('cg-name').value.trim();
+  if(!name){ toast('Group needs a name'); return; }
+  const button=document.querySelector('.modal button.btn-primary');
+  if(button){button.disabled=true;button.textContent='Creating…';}
+  try{
+    const description = document.getElementById('cg-desc').value.trim();
+    const category = document.getElementById('cg-cat').value;
+    const privacy = document.getElementById('cg-priv').value;
+    const id = await createGroup({name, description, image:createGroupImage, category, privacy});
+    closeModal();
+    go('groupDetail',{id});
+  }catch(err){
+    console.error('Create group error:',err);
+    toast(err.message||'Could not create group.');
+    if(button){button.disabled=false;button.textContent='Create group';}
+  }
+}
+
+function openReport(type, targetId){
+  openModal(`
+    <h3>Report ${type}</h3>
+    <div class="field"><label>Reason</label><select id="rep-reason">${REPORT_REASONS.map(r=>`<option>${r}</option>`).join('')}</select></div>
+    <div class="field"><label>Additional details (optional)</label><textarea id="rep-details" rows="3"></textarea></div>
+    <button class="btn btn-primary" style="width:100%" onclick="submitReportModal('${type}','${targetId}')">Submit report</button>
+  `);
+}
+function submitReportModal(type, targetId){
+  const reason = document.getElementById('rep-reason').value;
+  const details = document.getElementById('rep-details').value;
+  submitReport(type, targetId, reason, details);
+  closeModal();
+}
+
+/* ================= BOOT ================= */
+async function boot(){
+  document.getElementById('app').innerHTML = `<div class="authwrap"><div class="faint">Loading Nyctophile…</div></div>`;
+  await loadDB();
+  if(supabaseClient){
+    try{
+      const {data,error}=await supabaseClient.auth.getSession();
+      if(error) throw error;
+      if(data.session?.user) await loadSupabaseProfile(data.session.user);
+      await loadSupabasePosts();
+      if(session?.id) await loadSupabaseGroups();
+      if(session?.id){ await loadSupabaseMessages(); await loadSupabaseNotifications(); subscribeToNotifications(); subscribeToMessageUpdates(); subscribeToPresence(); }
+      supabaseClient.auth.onAuthStateChange(async (event, authSession)=>{
+        if(event==='SIGNED_OUT'){ session=null; if(route.view!=='landing') go('landing'); }
+        else if(event==='SIGNED_IN' && authSession?.user && !session){
+          try{ await loadSupabaseProfile(authSession.user); await loadSupabasePosts(); await loadSupabaseGroups(); await loadSupabaseMessages(); await loadSupabaseNotifications(); subscribeToNotifications(); subscribeToMessageUpdates(); subscribeToPresence(); go('home'); }
+          catch(err){ console.error('Profile load error:',err); toast(err.message); }
+        }
+      });
+    }catch(err){ console.error('Supabase session error:',err); }
+  }
+  renderApp();
+}
+boot();
+</script>
+</body>
+</html>
